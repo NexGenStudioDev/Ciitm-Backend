@@ -45,6 +45,7 @@ export const uploadOnCloudinary = async (localFilePath) => {
 
     return ImageDetail;
   } catch (error) {
+    console.log('Error uploading to Cloudinary:', error.message);
     fs.unlinkSync(`public/upload/${localFilePath}`);
     throw Error(error.message);
   }

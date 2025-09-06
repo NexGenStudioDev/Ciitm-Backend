@@ -10,24 +10,6 @@ import ImageUtils from '../Image/Image.utils.mjs';
 // This function will handle the logic of fetching the dashboard data
 let find_DashBoard_Data = async (io, socket) => {
   try {
-    const token = socket.handshake.auth?.token;
-
-    if (!token) {
-      throw new Error('Unauthorized User: Missing token');
-    }
-
-    let email = await AuthUtils.DecodeToken(token);
-
-    if (!email) {
-      throw new Error('Unauthorized User: Missing email in token');
-    }
-
-    const findRole = await Authentication.checkRole(email);
-
-    if (findRole !== 'admin') {
-      throw new Error('Bad Request: You are Not Verified Admin');
-    }
-
     // Fetch the number of contacts
     let NUMBER_OF_CONTACT = await ContactUtils.FIND_NUMBER_OF_CONTACT();
     let NUMBER_OF_ADMISSION = await AdmissionUtils.FIND_NUMBER_OF_ADMISSION();

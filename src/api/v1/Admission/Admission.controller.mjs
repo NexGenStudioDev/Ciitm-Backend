@@ -22,7 +22,6 @@ class AdmissionController {
       const data = req.body;
       let { courseName } = req.body;
 
-      console.log('Received data:', data);
       if (!req.file) {
         throw new Error('No file uploaded');
       }

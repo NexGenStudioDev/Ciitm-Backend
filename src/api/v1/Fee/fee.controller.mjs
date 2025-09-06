@@ -11,6 +11,7 @@ import { UpdateFee_Validator } from './fee.validator.mjs';
 import cf from '../../../utils/cashfree.mjs';
 import Fee from './fee.model.mjs';
 import Admission from '../Admission/Admission.model.mjs';
+import AuthUtils from '../Auth/Auth.utils.mjs';
 
 const FeeController = {
   // ✅ Get student fee info by unique ID
@@ -168,6 +169,30 @@ const FeeController = {
     }
   },
 
+  get_StudentFee_Types: async (req, res) => {
+    try {
+      const token = req.cookies?.token || req.headers['authorization'];
+
+      let email = await AuthUtils.DecodeToken(token);
+      let user = await AuthUtils.FindByEmail(email);
+      console.log('user in get_StudentFee_Types:', user);
+      const feeTypes = await feeService.get_Student_FeeAmountAnd_FeeType(String(user._id));
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        Payment_Constant.FETCH_FEE_TYPES_SUCCESS,
+        feeTypes
+      );
+    } catch (error) {
+      console.error('Error in get_StudentFee_Types:', error);
+      SendResponse.error(
+        res,
+        StatusCodeConstant.INTERNAL_SERVER_ERROR,
+        error.message || Payment_Constant.FAILED_TO_FETCH_FEE_TYPES
+      );
+    }
+  },
+
   // ✅ Get student's bill info by payment ID
   get_StudentBillByPaymentId: async (req, res) => {
     try {
@@ -275,7 +300,6 @@ const FeeController = {
 
       const response = await cf.PGFetchOrder(order_id);
       const data = response?.data;
-    
 
       const cfOrderStatus = data?.order_status || 'UNKNOWN';
 
@@ -296,11 +320,8 @@ const FeeController = {
         throw new Error('Student not found');
       }
 
-
       const currentPaid = foundStudent?.fee?.amount_paid || 0;
-      const currentDue =
-        foundStudent?.fee?.amount_due;
-
+      const currentDue = foundStudent?.fee?.amount_due;
 
       // Update Admission record if payment is successful
       if (paymentStatus === 'Completed') {
@@ -312,7 +333,6 @@ const FeeController = {
             amountPaid: data?.order_amount || 0,
             dueFee: currentDue - (data?.order_amount || 0),
             totalFee: foundStudent.fee.course_Fee,
-
           },
           { new: true }
         );
@@ -323,14 +343,12 @@ const FeeController = {
         const Paid_amount = updatedFee.Paid_amount || 0;
         const totalFee = updatedFee.totalFee || 0;
 
-       
-      
-
         await Admission.findOneAndUpdate(
           { uniqueId },
           {
             $set: {
-              'fee.amount_paid': Number(currentPaid) + Number(data?.order_amount),
+              'fee.amount_paid':
+                Number(currentPaid) + Number(data?.order_amount),
               'fee.amount_due': Number(currentDue) - Number(data?.order_amount),
             },
           },

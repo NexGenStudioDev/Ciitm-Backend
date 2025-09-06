@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import TeacherController from './Teacher.controller.mjs';
 import AuthMiddleware from '../../../middleware/Auth.middleware.mjs';
+import upload from '../../../utils/multerUtils.mjs';
+
 const router = Router();
 
 router.post(
   '/v1/admin/teacher/create',
-  AuthMiddleware.Admin,
+  upload.single('Avtar'),
   TeacherController.createNewTeacher
 );
 router.delete(

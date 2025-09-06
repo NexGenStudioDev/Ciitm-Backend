@@ -30,8 +30,8 @@ class AuthController {
         res,
         200,
         AuthConstant.USER_CREATED,
-        CreatedUser,
-        HashEmail
+        CreatedUser
+        // HashEmail
       );
     } catch (error) {
       SendResponse.error(res, 500, error.message || 'Error creating admin');
@@ -80,7 +80,7 @@ class AuthController {
           profile_image: Find_User.picture,
           role: Find_User.role,
           isActice: Find_User.isActive,
-          token: HashEmail,
+          // token: HashEmail,
         },
       };
       SendResponse.success(

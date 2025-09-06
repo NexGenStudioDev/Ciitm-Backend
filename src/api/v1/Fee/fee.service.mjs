@@ -1,6 +1,7 @@
 import Admission from '../Admission/Admission.model.mjs';
 import Fee from './fee.model.mjs';
 import Crypto from 'crypto';
+import mongoose from 'mongoose';
 
 class Fee_Service {
   Update_Student_fee = async ({
@@ -152,6 +153,49 @@ class Fee_Service {
       console.error('Error in get_StudentBillByPaymentId:', error);
       throw new Error(
         error.message || 'Failed to fetch student bill by payment ID'
+      );
+    }
+  };
+
+  get_Student_FeeAmountAnd_FeeType = async (studentId) => {
+    console.log('studentId in service:', studentId);
+    try {
+
+      const fees = await Fee.find({ studentId: studentId }); // debug line
+      console.log('Fees found:', fees); // debug line
+   
+      const summary = await Fee.aggregate([
+        {
+          $match: {
+            studentId: new mongoose.Types.ObjectId(studentId),
+            status: 'Completed', // Optional: filter only completed payments
+          },
+        },
+        {
+          $group: {
+            _id: '$PaymentType',
+            totalAmountPaid: { $sum: '$amountPaid' },
+            count: { $sum: 1 }, // Optional: count number of transactions
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            PaymentType: '$_id',
+            totalAmountPaid: 1,
+            count: 1,
+          },
+        },
+      ]);
+  
+      return summary;
+
+      console.log('Payment Summary:', paymentSummary);
+      return paymentSummary;
+    } catch (error) {
+      console.error('Error in get_Student_FeeAmountAnd_FeeType:', error);
+      throw new Error(
+        error.message || 'Failed to fetch student fee payment summary'
       );
     }
   };

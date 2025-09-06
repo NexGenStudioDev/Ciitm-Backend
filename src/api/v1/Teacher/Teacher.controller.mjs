@@ -10,16 +10,17 @@ class Teacher_Controller {
     try {
       const { filename } = req.file;
 
-      let Cloudinary = await uploadOnCloudinary({
-        file: filename,
-        folder: 'Teachers',
-      });
+      if (!filename) {
+        throw new Error(TeacherConstant.Image_Required);
+      }
+
+      let validatedData = await TeacherService.validateTeacherData(req.body);
+
+      let Cloudinary = await uploadOnCloudinary(filename);
 
       if (!Cloudinary) {
         throw new Error(TeacherConstant.Image_NotUploaded);
       }
-
-      let validatedData = await TeacherService.validateTeacherData(req.body);
 
       let CreateTeacher = await TeacherService.createTeacher({
         teacherData: req.body,
