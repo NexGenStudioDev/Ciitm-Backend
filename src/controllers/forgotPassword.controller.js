@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { createTransport } from '../utils/SendMail.js';
 import dotenv from 'dotenv';
+import AuthUtils from '../api/v1/Auth/Auth.utils.mjs';
 dotenv.config();
 
 export let ForgotPassword_Controller = async (req, res) => {
@@ -65,7 +66,7 @@ export let ResetPassword_Controller = async (req, res) => {
       return res.status(400).json({ message: 'Invalid OTP' });
     }
 
-    let email = await Authentication.DecordToken(req.cookies.token);
+    let email = await AuthUtils.DecodeToken(req.cookies.token);
     let hashedPassword = await bcrypt.hash(new_Password, 10);
 
     await Authentication.updateOne(

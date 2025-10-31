@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import logger from './loggerMiddleware.js';
 
 import Authentication from '../api/v1/Auth/Auth.model.mjs';
+import AuthUtils from '../api/v1/Auth/Auth.utils.mjs';
 
 dotenv.config({
   path: '../../.env',
@@ -21,7 +22,7 @@ export const AdminVerify = async (req, res, next) => {
       });
     }
 
-    let email = await Authentication.DecordToken(token);
+    let email = await AuthUtils.DecodeToken(token);
 
     if (!email) {
       return res.status(403).json({
@@ -67,7 +68,7 @@ export const StudentVerify = async (req, res, next) => {
       });
     }
 
-    let email = await Authentication.DecordToken(token);
+    let email = await AuthUtils.DecodeToken(token);
 
     if (!email) {
       return res.status(403).json({

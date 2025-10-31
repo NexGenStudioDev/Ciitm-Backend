@@ -1,9 +1,10 @@
 import Authentication from '../api/v1/Auth/Auth.model.mjs';
+import AuthUtils from '../api/v1/Auth/Auth.utils.mjs';
 
 export let Profile_Controller = async (req, res) => {
   try {
     let { token } = req.cookies;
-    let email = await Authentication.DecordToken(token);
+    let email = await AuthUtils.DecodeToken(token);
 
     if (!email) {
       return res.status(403).json({
