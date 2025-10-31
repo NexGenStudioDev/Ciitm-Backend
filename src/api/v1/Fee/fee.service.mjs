@@ -50,7 +50,7 @@ class Fee_Service {
         PaymentType: PaymentType,
         paymentMethod: 'Online Transfer',
         PaymentId: paymentId || `PAY-${Crypto.randomBytes(16).toString('hex')}`,
-        status: status || 'Pending',
+        status: 'Completed',
 
         paymentMethod: paymentMethod,
         PaymentId: paymentId || `PAY-${Crypto.randomBytes(16).toString('hex')}`,
@@ -158,24 +158,19 @@ class Fee_Service {
   };
 
   get_Student_FeeAmountAnd_FeeType = async (studentId) => {
-    console.log('studentId in service:', studentId);
     try {
-
-      const fees = await Fee.find({ studentId: studentId }); // debug line
-      console.log('Fees found:', fees); // debug line
-   
       const summary = await Fee.aggregate([
         {
           $match: {
             studentId: new mongoose.Types.ObjectId(studentId),
-            status: 'Completed', // Optional: filter only completed payments
+            status: 'Completed', // ✅ Only completed payments
           },
         },
         {
           $group: {
             _id: '$PaymentType',
             totalAmountPaid: { $sum: '$amountPaid' },
-            count: { $sum: 1 }, // Optional: count number of transactions
+            count: { $sum: 1 },
           },
         },
         {
@@ -187,11 +182,8 @@ class Fee_Service {
           },
         },
       ]);
-  
-      return summary;
 
-      console.log('Payment Summary:', paymentSummary);
-      return paymentSummary;
+      return summary;
     } catch (error) {
       console.error('Error in get_Student_FeeAmountAnd_FeeType:', error);
       throw new Error(

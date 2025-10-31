@@ -173,10 +173,12 @@ const FeeController = {
     try {
       const token = req.cookies?.token || req.headers['authorization'];
 
-      let email = await AuthUtils.DecodeToken(token);
-      let user = await AuthUtils.FindByEmail(email);
-      console.log('user in get_StudentFee_Types:', user);
-      const feeTypes = await feeService.get_Student_FeeAmountAnd_FeeType(String(user._id));
+      // let email = await AuthUtils.DecodeToken(token);
+      // let user = await AuthUtils.FindByEmail(email);
+      // console.log('user in get_StudentFee_Types:', user);
+      const feeTypes = await feeService.get_Student_FeeAmountAnd_FeeType(
+        String('68a20d09d1250cf589498b85')
+      );
       SendResponse.success(
         res,
         StatusCodeConstant.SUCCESS,

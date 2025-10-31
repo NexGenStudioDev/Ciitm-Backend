@@ -4,6 +4,7 @@ import TestimonialUtils from './Testimonial.utils.mjs';
 import { TestimonialValidator } from './Testimonial.validator.mjs';
 import Testimonial_Service from './Testimonial.service.mjs';
 import Testimonial from './Testimonial.model.mjs';
+import { Delete_From_Cloudinary } from '../../../utils/Cloudinary.mjs';
 
 class Testimonial_Controller {
   Create_Testimonial_Controller = async (req, res) => {
@@ -11,8 +12,6 @@ class Testimonial_Controller {
       let data = req.body;
       let file = req.file;
 
-      console.log('File:', file);
-      console.log('Data:', req.body);
 
       let Find_Testimonial = await TestimonialUtils.FIND_TestimonialByEmail(
         data.email

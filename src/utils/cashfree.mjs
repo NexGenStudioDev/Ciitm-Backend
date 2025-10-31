@@ -4,7 +4,7 @@ dotenv.config();
 import { Cashfree, CFEnvironment } from 'cashfree-pg';
 
 var cf = new Cashfree(
-  Cashfree.SANDBOX,
+  Cashfree.SANDBOX, // (SANDBOX or PRODUCTION)
   process.env.CASHFREE_CLIENT_ID,
   process.env.CASHFREE_CLIENT_SECRET
 );
