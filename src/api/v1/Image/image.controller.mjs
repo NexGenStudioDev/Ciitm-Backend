@@ -21,7 +21,7 @@ class Image_Controller {
       const { filename } = req.file;
       const token = req.cookies.token;
 
-      let email = await Authentication.DecordToken(token);
+      let email = await AuthUtils.DecodeToken(token);
 
       let find_Admin = await AuthUtils.FindByEmail(email);
 
