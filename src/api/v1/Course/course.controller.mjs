@@ -1,4 +1,5 @@
 import StatusCodeConstant from '../../../constant/StatusCode.constant.mjs';
+import { uploadOnCloudinary } from '../../../utils/Cloudinary.mjs';
 import SendResponse from '../../../utils/SendResponse.mjs';
 import courseConstant from './course.constant.mjs';
 import courseService from './course.service.mjs';
@@ -7,7 +8,13 @@ import courseUtils from './course.utils.mjs';
 const Course_Controller = {
   async createCourse(req, res) {
     try {
-      const newCourse = await courseService.createCourse(req.body);
+    
+       const { filename } = req.file;
+
+
+       let upload = await  uploadOnCloudinary(filename);
+
+      const newCourse = await courseService.createCourse({ ...req.body, courseThumbnail: upload.url });
       if (!newCourse) {
         throw new Error(courseConstant.COURSE_NOT_CREATED);
       }

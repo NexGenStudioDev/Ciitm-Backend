@@ -1,5 +1,9 @@
 import express from 'express';
 const app = express();
+
+
+import cors from 'cors';
+
 import { AuthRouter } from '../api/v1/Auth/Auth.routes.mjs';
 import { RoleRouter } from '../api/v1/Role/Role.routes.mjs';
 import { StatusRouter } from '../api/v1/Status/Status.routes.mjs';
@@ -21,6 +25,42 @@ import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.route
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
 import { ChatRouter } from '../api/v1/Chat/Chat.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
+import envConstant from '../constant/env.constant.mjs';
+
+
+
+app.use((req, res, next) => {
+  console.log('METHOD :', req.method);
+  console.log('URL :', req.url);
+  console.log('ORIGIN :', req.headers.origin);
+  next();
+});
+
+const whitelist = new Set([
+  envConstant.FRONTEND_URL?.replace(/\/$/, ''),
+  'http://localhost:5173',
+]);
+
+app.use(
+  cors({
+    credentials: true,
+
+    origin(origin, callback) {
+      const cleanOrigin = origin?.replace(/\/$/, '');
+      console.log('Incoming Origin:', origin);
+
+      if (!cleanOrigin || whitelist.has(cleanOrigin)) {
+        return callback(null, true);
+      }
+
+      console.error(`CORS Error: ${cleanOrigin}`);
+
+      return callback(new Error('Not allowed by CORS'));
+    },
+  })
+);
+
+
 
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));

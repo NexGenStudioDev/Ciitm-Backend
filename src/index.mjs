@@ -15,7 +15,6 @@ import lolcat from 'lolcatjs';
 
 app.use(cookieParser());
 
-import cors from 'cors';
 
 import { fileURLToPath } from 'url';
 import SocketEvent from './config/Socket/SocketEvent.mjs';
@@ -28,27 +27,13 @@ app.get('/', (req, res) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const whitelist = new Set([envConstant.FRONTEND_URL, 'http://localhost:5173']);
+app.use((req, res, next) => {
+  console.log('METHOD :', req.method);
+  console.log('URL :', req.url);
+  console.log('ORIGIN :', req.headers.origin);
+  next();
+});
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.has(origin) || !origin) {
-      callback(null, true);
-    } else {
-      console.error(`CORS error: Origin ${origin} not allowed`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
-
-app.use(
-  cors(
-    envConstant.isDevelopment
-      ? corsOptions
-      : { origin: envConstant.FRONTEND_URL, credentials: true }
-  )
-);
 
 app.use(express.static(path.join(path.resolve(), 'public')));
 app.use(

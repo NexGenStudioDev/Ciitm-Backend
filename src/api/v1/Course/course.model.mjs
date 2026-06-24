@@ -1,4 +1,6 @@
 import { model, Schema } from 'mongoose';
+import { DepartmentConstant } from './course.constant.mjs';
+
 
 let Course_Schema = new Schema({
   courseName: {
@@ -6,6 +8,11 @@ let Course_Schema = new Schema({
     required: true,
     trim: true,
   },
+
+  AdmissionCriteria: [{
+    type: String,
+    required: true,
+  }],
 
   courseCode: {
     type: String,
@@ -38,15 +45,22 @@ let Course_Schema = new Schema({
     trim: true,
   },
 
-  imageUrl: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+
 
   coursePrice: {
     type: Number,
     required: true,
+  },
+
+  Department: {
+    type: String,
+    enum: DepartmentConstant,
+    required: true,
+  },
+
+  numberOfStudentsEnrolled: {
+    type: Number,
+    default: 0,
   },
 });
 

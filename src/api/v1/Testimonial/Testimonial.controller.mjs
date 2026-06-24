@@ -12,7 +12,6 @@ class Testimonial_Controller {
       let data = req.body;
       let file = req.file;
 
-
       let Find_Testimonial = await TestimonialUtils.FIND_TestimonialByEmail(
         data.email
       );
