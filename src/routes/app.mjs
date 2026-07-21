@@ -23,7 +23,6 @@ import { TeacherRouter } from '../api/v1/Teacher/Teacher.routes.mjs';
 import { StudentRouter } from '../api/v1/Student/Student.routes.mjs';
 import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.routes.mjs';
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
-import { ChatRouter } from '../api/v1/Chat/Chat.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
 import envConstant from '../constant/env.constant.mjs';
 
@@ -84,7 +83,6 @@ app.use(
   CourseRouter,
   TeacherRouter,
   StudentRouter,
-  ChatRouter,
   TestimonialRouter
 );
 
