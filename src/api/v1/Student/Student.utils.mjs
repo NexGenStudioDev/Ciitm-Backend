@@ -38,7 +38,7 @@ class Student_Utils {
       };
 
       let a = Admission.find(query, null, options).select(
-        'uniqueId student.firstName student.lastName student.middleName student.email student.contactNumber isAdmitted'
+        'uniqueId student.firstName student.lastName student.middleName student.email  student.avtar student.contactNumber isAdmitted'
       );
 
       return a.exec().then((students) => {

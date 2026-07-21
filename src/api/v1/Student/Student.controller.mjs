@@ -34,6 +34,7 @@ class Student_Controller {
         students
       );
     } catch (error) {
+      console.log(error)
       SendResponse.error(
         res,
         StatusCodeConstant.INTERNAL_SERVER_ERROR,
