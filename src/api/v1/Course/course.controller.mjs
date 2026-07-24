@@ -8,13 +8,14 @@ import courseUtils from './course.utils.mjs';
 const Course_Controller = {
   async createCourse(req, res) {
     try {
-    
-       const { filename } = req.file;
+      const { filename } = req.file;
 
+      let upload = await uploadOnCloudinary(filename);
 
-       let upload = await  uploadOnCloudinary(filename);
-
-      const newCourse = await courseService.createCourse({ ...req.body, courseThumbnail: upload.url });
+      const newCourse = await courseService.createCourse({
+        ...req.body,
+        courseThumbnail: upload.url,
+      });
       if (!newCourse) {
         throw new Error(courseConstant.COURSE_NOT_CREATED);
       }

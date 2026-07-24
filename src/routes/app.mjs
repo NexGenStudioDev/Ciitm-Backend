@@ -1,7 +1,6 @@
 import express from 'express';
 const app = express();
 
-
 import cors from 'cors';
 
 import { AuthRouter } from '../api/v1/Auth/Auth.routes.mjs';
@@ -25,8 +24,6 @@ import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.route
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
 import envConstant from '../constant/env.constant.mjs';
-
-
 
 app.use((req, res, next) => {
   console.log('METHOD :', req.method);
@@ -58,8 +55,6 @@ app.use(
     },
   })
 );
-
-
 
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));

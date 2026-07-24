@@ -6,6 +6,11 @@ router.get(
   '/v1/Student/FindByCourseAndSemester',
   StudentController.FindByCourseAndSemester
 );
+
+router.get(
+  '/v1/Student/FindByUniqueId',
+  StudentController.FindStudentIdByUniqueId
+);
 router.get(
   '/v1/Student/validate/:uniqueId',
   StudentController.validateUniqueId

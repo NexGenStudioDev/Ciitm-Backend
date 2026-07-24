@@ -27,8 +27,6 @@ let Env_Validator = Joi.object({
     'any.required': 'GOOGLE_CLIENT_ID is required',
   }),
 
-
-
   JWT_SECRET: Joi.string().min(8).required().messages({
     'string.base': 'JWT_SECRET must be a string',
     'any.required': 'JWT_SECRET is required',

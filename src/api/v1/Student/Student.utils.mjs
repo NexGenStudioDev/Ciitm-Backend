@@ -15,6 +15,14 @@ class Student_Utils {
     return student._id;
   };
 
+  FindStudent = async (uniqueId) => {
+    const student = await Admission.findOne({ uniqueId: uniqueId });
+    if (!student) {
+      throw new Error('Student not found');
+    }
+    return student;
+  };
+
   FindStudentBySemesterAndCourse = async ({
     semester,
     course,
@@ -38,7 +46,7 @@ class Student_Utils {
       };
 
       let a = Admission.find(query, null, options).select(
-        'uniqueId student.firstName student.lastName student.middleName student.email  student.avtar student.contactNumber isAdmitted'
+        'uniqueId student.firstName student.lastName student.middleName student.email  student.avtar student.contactNumber student.dateOfBirth fee.amount_paid  isAdmitted'
       );
 
       return a.exec().then((students) => {

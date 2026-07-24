@@ -11,21 +11,17 @@ const COURSE_Constant = {
   STUDENT_NOT_FOUND: 'Student Not Found',
 };
 
-
 export const DepartmentConstant = [
-  "Management",
-  "Engineering",
-  "Science",
-  "Arts",
-  "Business",
-  "Law",
-  "Medicine",
-  "Education",
-  "Social Sciences",
-  "Humanities",
+  'Management',
+  'Engineering',
+  'Science',
+  'Arts',
+  'Business',
+  'Law',
+  'Medicine',
+  'Education',
+  'Social Sciences',
+  'Humanities',
 ];
 
-
 export default Object.freeze(COURSE_Constant);
-
-
