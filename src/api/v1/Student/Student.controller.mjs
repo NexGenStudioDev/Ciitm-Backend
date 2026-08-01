@@ -34,6 +34,7 @@ class Student_Controller {
         students
       );
     } catch (error) {
+      console.log(error);
       SendResponse.error(
         res,
         StatusCodeConstant.INTERNAL_SERVER_ERROR,
@@ -41,6 +42,27 @@ class Student_Controller {
       );
     }
   }
+
+  FindStudentIdByUniqueId = async (req, res) => {
+    try {
+      const { uniqueId } = req.query;
+
+      let findStudentById = await StudentUtils.FindStudent(uniqueId);
+
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        StudentConstant.STUDENT_FOUND,
+        findStudentById
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        StatusCodeConstant.BAD_REQUEST,
+        error.message || 'Error validating student ID'
+      );
+    }
+  };
 
   async Get_BILLING_INVOICE(req, res) {
     try {

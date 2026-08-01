@@ -15,7 +15,6 @@ import lolcat from 'lolcatjs';
 
 app.use(cookieParser());
 
-
 import { fileURLToPath } from 'url';
 import SocketEvent from './config/Socket/SocketEvent.mjs';
 import Socket_Middleware from './config/Socket/SocketMiddleWare.mjs';
@@ -33,7 +32,6 @@ app.use((req, res, next) => {
   console.log('ORIGIN :', req.headers.origin);
   next();
 });
-
 
 app.use(express.static(path.join(path.resolve(), 'public')));
 app.use(

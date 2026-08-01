@@ -1,7 +1,6 @@
 import express from 'express';
 const app = express();
 
-
 import cors from 'cors';
 
 import { AuthRouter } from '../api/v1/Auth/Auth.routes.mjs';
@@ -23,11 +22,8 @@ import { TeacherRouter } from '../api/v1/Teacher/Teacher.routes.mjs';
 import { StudentRouter } from '../api/v1/Student/Student.routes.mjs';
 import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.routes.mjs';
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
-import { ChatRouter } from '../api/v1/Chat/Chat.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
 import envConstant from '../constant/env.constant.mjs';
-
-
 
 app.use((req, res, next) => {
   console.log('METHOD :', req.method);
@@ -60,8 +56,6 @@ app.use(
   })
 );
 
-
-
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -84,7 +78,6 @@ app.use(
   CourseRouter,
   TeacherRouter,
   StudentRouter,
-  ChatRouter,
   TestimonialRouter
 );
 

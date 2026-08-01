@@ -1,7 +1,6 @@
 import Joi from 'joi';
 import { DepartmentConstant } from './course.constant.mjs';
 
-
 export const courseValidationSchema = Joi.object({
   courseName: Joi.string().trim().min(3).required().messages({
     'string.empty': 'Course name cannot be empty',
@@ -63,10 +62,13 @@ export const courseValidationSchema = Joi.object({
     'any.required': 'Course price is required',
   }),
 
-  Department: Joi.string().valid(...DepartmentConstant).required().messages({
-    'any.only': `Department must be one of the following: ${DepartmentConstant.join(
-      ', '
-    )}`,
-    'any.required': 'Department is required',
-  }),
+  Department: Joi.string()
+    .valid(...DepartmentConstant)
+    .required()
+    .messages({
+      'any.only': `Department must be one of the following: ${DepartmentConstant.join(
+        ', '
+      )}`,
+      'any.required': 'Department is required',
+    }),
 });

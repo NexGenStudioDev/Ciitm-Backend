@@ -27,12 +27,6 @@ let Env_Validator = Joi.object({
     'any.required': 'GOOGLE_CLIENT_ID is required',
   }),
 
-  REDIS_URL: Joi.string().uri().required().messages({
-    'string.base': 'REDIS_URL must be a valid string',
-    'any.required': 'REDIS_URL is required',
-    'string.uri': 'REDIS_URL must be a valid URI',
-  }),
-
   JWT_SECRET: Joi.string().min(8).required().messages({
     'string.base': 'JWT_SECRET must be a string',
     'any.required': 'JWT_SECRET is required',
@@ -108,7 +102,6 @@ async function validateEnv() {
     NODE_ENV: process.env.NODE_ENV,
     Razorpay_key: process.env.Razorpay_key,
     Razorpay_secret: process.env.Razorpay_secret,
-    REDIS_URL: process.env.REDIS_URL,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     FRONTEND_URL: process.env.FRONTEND_URL,
     website_schema: process.env.website_schema,
