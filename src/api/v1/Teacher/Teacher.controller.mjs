@@ -3,7 +3,6 @@ import { uploadOnCloudinary } from '../../../utils/Cloudinary.mjs';
 import SendResponse from '../../../utils/SendResponse.mjs';
 import TeacherConstant from './Teacher.constant.mjs';
 import TeacherService from './Teacher.service.mjs';
-import Teacher_validation from './Teacher.validator.mjs';
 
 class Teacher_Controller {
   async createNewTeacher(req, res) {
@@ -14,7 +13,7 @@ class Teacher_Controller {
         throw new Error(TeacherConstant.Image_Required);
       }
 
-      let validatedData = await TeacherService.validateTeacherData(req.body);
+      const validatedData = await TeacherService.validateTeacherData(req.body);
 
       let Cloudinary = await uploadOnCloudinary(filename);
 
@@ -23,7 +22,7 @@ class Teacher_Controller {
       }
 
       let CreateTeacher = await TeacherService.createTeacher({
-        teacherData: req.body,
+        teacherData: validatedData,
         imageUrl: Cloudinary.url,
       });
 

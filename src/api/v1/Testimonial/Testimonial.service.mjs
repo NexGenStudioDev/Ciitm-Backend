@@ -17,7 +17,7 @@ class Testimonial_Service {
         star: data.star,
       });
 
-      if (!Create_Testimonial) {
+      if (!Created_Testimonial) {
         throw new Error('Failed to Create Testimonial');
       }
 

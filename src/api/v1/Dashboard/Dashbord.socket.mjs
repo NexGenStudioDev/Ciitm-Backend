@@ -1,7 +1,5 @@
 import AdmissionUtils from '../Admission/Admission.utils.mjs';
 import AlbumUtils from '../Album/Album.utils.mjs';
-import Authentication from '../Auth/Auth.model.mjs';
-import AuthUtils from '../Auth/Auth.utils.mjs';
 import ContactUtils from '../Contact/Contact.utils.mjs';
 import courseUtils from '../Course/course.utils.mjs';
 import feeUtils from '../Fee/fee.utils.mjs';

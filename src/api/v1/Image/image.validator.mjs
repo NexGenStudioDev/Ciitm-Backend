@@ -1,9 +1,10 @@
 import Joi from 'joi';
+import User from '../Auth/Auth.model.mjs';
 
 export let Create_Image_Validator = Joi.object({
   userID: Joi.string()
     .hex()
-    .custom(async function (value, helpers) {
+    .custom(async function (value) {
       const user = await User.findById(value);
       if (!user) {
         throw new Error('User not found');

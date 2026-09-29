@@ -8,7 +8,6 @@ jest.unstable_mockModule('../Admission.model.mjs', () => ({
 
 // Import modules after mocks
 const { default: admissionService } = await import('../Admission.service.mjs');
-const { default: Admission } = await import('../Admission.model.mjs');
 const { default: AdmissionConstant } = await import(
   '../Admission.constant.mjs'
 );

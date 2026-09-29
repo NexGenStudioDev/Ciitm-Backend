@@ -50,14 +50,16 @@ cd Ciitm-Backend
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
 # Set up environment variables
 cp .env.example .env
 # Edit .env with your configuration
 
 # Start development server
-pnpm run start:dev
+npm run dev
+# or for live reload
+npm run start:dev
 ```
 
 ### 3. Create a Branch
@@ -89,13 +91,13 @@ git checkout -b bugfix/issue-description
 
 ```bash
 # Run tests
-pnpm test
+npm test
 
 # Run tests in watch mode
-pnpm run test:watch
+npm run test:watch
 
 # Run linting
-pnpm run lint
+npm run lint
 ```
 
 ## 📝 Contribution Types

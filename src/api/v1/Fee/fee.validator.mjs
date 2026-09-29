@@ -16,7 +16,7 @@ export let UpdateFee_Validator = Joi.object({
       'string.empty': 'Payment method is required',
       'any.required': 'Payment method is required',
       'any.only':
-        "Payment method must be one of 'Cash', 'Cheque', 'Online Transfer', 'UPI', or 'Card Payment'",
+        'Payment method must be one of \'Cash\', \'Cheque\', \'Online Transfer\', \'UPI\', or \'Card Payment\'',
     }),
 
   PaymentType: Joi.string()
@@ -33,7 +33,7 @@ export let UpdateFee_Validator = Joi.object({
       'string.empty': 'Payment type is required',
       'any.required': 'Payment type is required',
       'any.only':
-        "Payment type must be one of 'Admission Fee', 'Farewell Fee', 'Teacher Day Fee', 'Exam Fee', 'Semester Fee', or 'Other'",
+        'Payment type must be one of \'Admission Fee\', \'Farewell Fee\', \'Teacher Day Fee\', \'Exam Fee\', \'Semester Fee\', or \'Other\'',
     }),
   totalFee: Joi.number().required().messages({
     'number.base': 'Total fee must be a number',

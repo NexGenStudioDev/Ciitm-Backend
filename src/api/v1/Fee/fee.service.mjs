@@ -48,12 +48,9 @@ class Fee_Service {
         totalFee: totalFee,
         dueFee: currentDue - Paid_amount,
         PaymentType: PaymentType,
-        paymentMethod: 'Online Transfer',
+        paymentMethod: paymentMethod || 'Online Transfer',
         PaymentId: paymentId || `PAY-${Crypto.randomBytes(16).toString('hex')}`,
-        status: 'Completed',
-
-        paymentMethod: paymentMethod,
-        PaymentId: paymentId || `PAY-${Crypto.randomBytes(16).toString('hex')}`,
+        status: status || 'Completed',
       });
 
       return feeCreate;

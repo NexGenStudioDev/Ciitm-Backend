@@ -1,22 +1,14 @@
 import crypto from 'crypto';
-
-import AuthenticationSchema from '../Auth/Auth.model.mjs';
-
-import STUDENT_Constant from '../Student/Student.constant.mjs';
 import StatusCodeConstant from '../../../constant/StatusCode.constant.mjs';
 import SendResponse from '../../../utils/SendResponse.mjs';
 import StatusConstant from './Status.constant.mjs';
 import StatusUtils from './Status.utils.mjs';
-import AuthUtils from '../Auth/Auth.utils.mjs';
 import StudentUtils from '../Student/Student.utils.mjs';
-import EmailService from '../Email/Email.service.mjs';
-import EmailConstant from '../Email/Email.constant.mjs';
 import StatusService from './Status.service.mjs';
-import AuthConstant from '../Auth/Auth.constant.mjs';
 import AuthService from '../Auth/Auth.service.mjs';
+import AuthConstant from '../Auth/Auth.constant.mjs';
 import { Update_Status_Validation } from './status.validator.mjs';
 import StudentConstant from '../Student/Student.constant.mjs';
-import path from 'path';
 
 class Status_Controller {
   Find_Student_Status = async (req, res) => {
@@ -78,8 +70,6 @@ class Status_Controller {
         throw new Error(StudentConstant.STUDENT_NOT_FOUND);
       }
 
-      let Authentication_Instance = new AuthenticationSchema();
-
       let validate = Update_Status_Validation.validate({
         message,
         applicationStatus,
@@ -95,8 +85,7 @@ class Status_Controller {
         applicationStatus: applicationStatus,
       });
 
-      if (applicationStatus !== 'Approved') {
-      } else {
+      if (applicationStatus === 'Approved') {
         // Generate a more secure password
         const password = 'Ciitm@' + crypto.randomBytes(8).toString('hex');
 
@@ -126,7 +115,7 @@ class Status_Controller {
       SendResponse.success(
         res,
         StatusCodeConstant.SUCCESS,
-        STUDENT_Constant.STATUS_UPDATED,
+        StudentConstant.STATUS_UPDATED,
         Updated_Student_Status
       );
     } catch (error) {

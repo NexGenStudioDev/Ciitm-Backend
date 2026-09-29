@@ -1,4 +1,3 @@
-import cron from 'node-cron';
 import { Schema, model } from 'mongoose';
 
 const noticeSchema = new Schema({

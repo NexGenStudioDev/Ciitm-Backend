@@ -10,6 +10,9 @@ class Role_Controller {
       let { email } = req.body;
 
       let find_Admin_Role = await RoleUtils.Find_Role(email);
+      if (find_Admin_Role) {
+        throw new Error(RoleConstant.ROLE_ALREADY_EXISTS);
+      }
 
       let Create_Admin = await RoleService.create_Admin_Role(email);
 

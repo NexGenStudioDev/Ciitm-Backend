@@ -52,7 +52,7 @@ const AdmissionSchema = new Schema({
       trim: true,
       lowercase: true,
       unique: [true, 'Email already exists'],
-      match: [/.+\@.+\..+/, 'Please fill a valid email address'],
+      match: [/.+@.+\..+/, 'Please fill a valid email address'],
     },
 
     dateOfBirth: {
@@ -234,7 +234,7 @@ const AdmissionSchema = new Schema({
   },
 });
 
-AdmissionSchema.methods.generate_id = async function (courseName) {
+AdmissionSchema.methods.generate_id = async function () {
   const otp = otpGenerator.generate(6, {
     upperCaseAlphabets: false,
     specialChars: false,

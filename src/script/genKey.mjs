@@ -30,7 +30,7 @@ async function generateCert() {
     await run(
       `openssl x509 -req -in csr.pem -signkey ${keyPath} -out ${certPath} -days 365`
     );
-    await run(`rm csr.pem`);
+    await run('rm csr.pem');
 
     console.log('✅ SSL certificate generated at:', keyPath, 'and', certPath);
   } catch (err) {

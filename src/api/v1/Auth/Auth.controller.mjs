@@ -5,7 +5,6 @@ import AuthConstant from './Auth.constant.mjs';
 import AuthService from './Auth.service.mjs';
 import StatusCodeConstant from '../../../constant/StatusCode.constant.mjs';
 import envConstant from '../../../constant/env.constant.mjs';
-import { user } from '../../../routes/index.mjs';
 
 class AuthController {
   async SignUP_Admin(req, res) {

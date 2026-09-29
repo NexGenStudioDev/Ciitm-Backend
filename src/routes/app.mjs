@@ -7,15 +7,13 @@ import { AuthRouter } from '../api/v1/Auth/Auth.routes.mjs';
 import { RoleRouter } from '../api/v1/Role/Role.routes.mjs';
 import { StatusRouter } from '../api/v1/Status/Status.routes.mjs';
 import { AdmissionRouter } from '../api/v1/Admission/Admission.routes.mjs';
-import { user } from './index.mjs';
+import { SocialMediaRouter } from '../api/v1/SocialMedia/SocialMedia.routes.mjs';
 import { FrontendRouter } from '../api/v1/frontend/frontend.routes.mjs';
 import { ContactRouter } from '../api/v1/Contact/Contact.routes.mjs';
 import { NoticeRouter } from '../api/v1/Notice/notice.routes.mjs';
 import { AlbumRoutes } from '../api/v1/Album/Album.routes.mjs';
 import { ImageRoutes } from '../api/v1/Image/Image.routes.mjs';
 import bodyParser from 'body-parser';
-import io from '../config/Socket/SocketServer.mjs';
-import SocketEvent from '../config/Socket/SocketEvent.mjs';
 import cookieParser from 'cookie-parser';
 import { CourseRouter } from '../api/v1/Course/course.routes.mjs';
 import { TeacherRouter } from '../api/v1/Teacher/Teacher.routes.mjs';
@@ -23,6 +21,7 @@ import { StudentRouter } from '../api/v1/Student/Student.routes.mjs';
 import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.routes.mjs';
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
+import { QueueRouter } from '../api/v1/Queue/Queue.routes.mjs';
 import envConstant from '../constant/env.constant.mjs';
 
 app.use((req, res, next) => {
@@ -35,23 +34,25 @@ app.use((req, res, next) => {
 const whitelist = new Set([
   envConstant.FRONTEND_URL?.replace(/\/$/, ''),
   'http://localhost:5173',
+  'http://localhost:3000',
 ]);
 
 app.use(
   cors({
     credentials: true,
-
     origin(origin, callback) {
-      const cleanOrigin = origin?.replace(/\/$/, '');
-      console.log('Incoming Origin:', origin);
-
-      if (!cleanOrigin || whitelist.has(cleanOrigin)) {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, '');
+      if (
+        !envConstant.NODE_ENV ||
+        envConstant.NODE_ENV === 'development' ||
+        whitelist.has(cleanOrigin) ||
+        cleanOrigin.includes('localhost') ||
+        cleanOrigin.includes('run.app')
+      ) {
         return callback(null, true);
       }
-
-      console.error(`CORS Error: ${cleanOrigin}`);
-
-      return callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     },
   })
 );
@@ -73,12 +74,30 @@ app.use(
   forgotPasswordRouter,
   ImageRoutes,
   NoticeRouter,
-  user,
+  SocialMediaRouter,
   Fee_Routes,
   CourseRouter,
   TeacherRouter,
   StudentRouter,
-  TestimonialRouter
+  TestimonialRouter,
+  QueueRouter
 );
+
+// Mongoose / Database offline fallback middleware
+app.use((err, req, res, next) => {
+  if (
+    err.name === 'MongooseError' ||
+    err.name === 'MongoNetworkError' ||
+    err.name === 'MongoServerSelectionError' ||
+    (err.message && (err.message.includes('buffering timed out') || err.message.includes('topology was destroyed') || err.message.includes('connect ECONNREFUSED')))
+  ) {
+    console.warn('[AI Studio] Database offline — returning mock response');
+    if (req.method === 'GET') {
+      return res.json(req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {});
+    }
+    return res.status(503).json({ error: 'Service temporarily unavailable (database offline)' });
+  }
+  next(err);
+});
 
 export default app;

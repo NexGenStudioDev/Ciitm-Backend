@@ -20,7 +20,6 @@ class AdmissionController {
   create = async (req, res) => {
     try {
       const data = req.body;
-      let { courseName } = req.body;
 
       if (!req.file) {
         throw new Error('No file uploaded');

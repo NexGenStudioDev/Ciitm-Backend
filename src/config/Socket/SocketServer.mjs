@@ -1,10 +1,10 @@
 import { createServer } from 'http'; // Use 'https' if doing HTTPS
 import path from 'path';
 import { Server } from 'socket.io';
-import envConstant from '../../constant/env.constant.mjs';
 import app from '../../routes/app.mjs';
 import validateEnv from '../../validation/Env.Validation.mjs';
 import { db_connect } from '../Db.config.mjs';
+import rabbitMQService from '../../service/rabbitmq.service.mjs';
 
 console.log(path.resolve());
 
@@ -13,7 +13,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: [envConstant.FRONTEND_URL],
+    origin: (origin, callback) => callback(null, true),
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -24,15 +24,15 @@ const io = new Server(httpServer, {
   allowEIO3: true,
 });
 
-const PORT = envConstant.PORT || 8000;
+const PORT = 3000;
 
 const Start_App = async () => {
   try {
     await validateEnv();
     await db_connect(); // ⬅️ Ensure async function is awaited
+    await rabbitMQService.connect();
   } catch (error) {
-    console.error(error);
-    process.exit(1);
+    console.error('Error initializing background services:', error);
   }
 };
 

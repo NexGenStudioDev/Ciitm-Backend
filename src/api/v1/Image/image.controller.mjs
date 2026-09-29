@@ -1,17 +1,13 @@
-import { get } from 'mongoose';
 import StatusCodeConstant from '../../../constant/StatusCode.constant.mjs';
 import { uploadOnCloudinary } from '../../../utils/Cloudinary.mjs';
 import SendResponse from '../../../utils/SendResponse.mjs';
 import AlbumConstant from '../Album/Album.constant.mjs';
 import AlbumUtils from '../Album/Album.utils.mjs';
 import AuthConstant from '../Auth/Auth.constant.mjs';
-import Authentication from '../Auth/Auth.model.mjs';
 import AuthUtils from '../Auth/Auth.utils.mjs';
 import ImageConstant from './Image.constant.mjs';
 import ImageService from './Image.service.mjs';
 import { Create_Image_Validator } from './image.validator.mjs';
-import Album from '../Album/Album.model.mjs';
-import logger from '../../../middleware/loggerMiddleware.js';
 import ImageUtils from './Image.utils.mjs';
 
 class Image_Controller {

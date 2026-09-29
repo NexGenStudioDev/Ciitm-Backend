@@ -1,7 +1,6 @@
 import StatusCodeConstant from '../../../constant/StatusCode.constant.mjs';
 import crypto from 'crypto';
 import SendResponse from '../../../utils/SendResponse.mjs';
-import StatusConstant from '../Status/Status.constant.mjs';
 import StudentConstant from '../Student/Student.constant.mjs';
 import StudentUtils from '../Student/Student.utils.mjs';
 import { Payment_Constant } from './fee.constant.mjs';
@@ -11,7 +10,6 @@ import { UpdateFee_Validator } from './fee.validator.mjs';
 import cf from '../../../utils/cashfree.mjs';
 import Fee from './fee.model.mjs';
 import Admission from '../Admission/Admission.model.mjs';
-import AuthUtils from '../Auth/Auth.utils.mjs';
 
 const FeeController = {
   // ✅ Get student fee info by unique ID
@@ -171,11 +169,6 @@ const FeeController = {
 
   get_StudentFee_Types: async (req, res) => {
     try {
-      const token = req.cookies?.token || req.headers['authorization'];
-
-      // let email = await AuthUtils.DecodeToken(token);
-      // let user = await AuthUtils.FindByEmail(email);
-      // console.log('user in get_StudentFee_Types:', user);
       const feeTypes = await feeService.get_Student_FeeAmountAnd_FeeType(
         String('68a20d09d1250cf589498b85')
       );
@@ -342,8 +335,6 @@ const FeeController = {
         if (!updatedFee) throw new Error('Failed to update fee status.');
 
         const { uniqueId } = updatedFee;
-        const Paid_amount = updatedFee.Paid_amount || 0;
-        const totalFee = updatedFee.totalFee || 0;
 
         await Admission.findOneAndUpdate(
           { uniqueId },

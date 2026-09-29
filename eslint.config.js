@@ -8,28 +8,34 @@ export default [
   // Language options
   {
     languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: {
-        ...globals.browser, // Use browser globals as needed
-        // Add other globals if necessary
+        ...globals.browser,
+        ...globals.node,
+        ...globals.jest,
       },
     },
   },
 
   // Main configuration
   {
-    files: ['*'], // Apply to all files
-    ignores: ['**/*.config.js', '/*.eslint-config-inspector'], // Ignore config files
+    files: ['**/*.{js,mjs,cjs,jsx}'],
+    ignores: ['**/*.config.js', '/*.eslint-config-inspector', 'node_modules/**'],
     rules: {
-      // 'no-unused-vars': 'warn', // Warn about unused variables
-      semi: ['warn', 'always'], // Require semicolons
-      quotes: ['warn', 'single'], // Enforce single quotes
-      'no-undef': 'warn', // Warn on undefined variables
+      'no-unused-vars': 'warn',
+      semi: ['warn', 'always'],
+      quotes: ['warn', 'single'],
+      'no-undef': 'warn',
       'no-redeclare': 'error',
       'no-empty': 'warn',
     },
     linterOptions: {
-      noInlineConfig: true, // Disallow inline configuration comments
-      reportUnusedDisableDirectives: 'error', // Report unused disable directives
+      noInlineConfig: false,
+      reportUnusedDisableDirectives: 'warn',
     },
   },
 ];

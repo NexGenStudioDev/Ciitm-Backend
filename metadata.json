@@ -1,0 +1,7 @@
+{
+  "name": "CIITM Backend API",
+  "description": "Backend API server for CIITM college management, admissions, courses, and administration.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

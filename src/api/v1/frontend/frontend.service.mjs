@@ -1,4 +1,5 @@
 import frontendConstant from './frontend.constant.mjs';
+import Frontend from './frontend.model.mjs';
 
 class FrontendService {
   Created_Frontend = async () => {

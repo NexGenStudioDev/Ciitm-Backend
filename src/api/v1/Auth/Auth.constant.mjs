@@ -6,7 +6,7 @@ const Auth_Constant = {
   USER_NOT_FOUND: 'User Not Found',
   HASH_FAILED: 'Failed to hash Password',
   USER_ALREADY_EXISTS: 'User Already Exists',
-  HASH_FAILED: 'Fail to Hash Email and Password',
+  HASH_EMAIL_PASSWORD_FAILED: 'Fail to Hash Email and Password',
 };
 
 export default Object.freeze(Auth_Constant);
