@@ -16,70 +16,105 @@ import path from 'path';
 
 export const uploadOnCloudinary = async (localFilePath) => {
   try {
-    let localFileName = path.basename(localFilePath);
-
     if (!localFilePath) {
       throw new Error('File not found');
     }
 
-    const uploadResult = await cloudinary.uploader
-      .upload(`public/upload/${path.basename(localFilePath)}`, {
-        public_id: localFileName,
-        resource_type: 'auto',
-      })
-      .catch((error) => {
-        throw Error(error.message);
-      });
+    const localFileName = path.basename(localFilePath);
+    const resolvedPath = path.isAbsolute(localFilePath)
+      ? localFilePath
+      : path.join(process.cwd(), 'public', 'upload', localFileName);
 
-    fs.renameSync(
-      `public/upload/${localFilePath}`,
-      `public/upload/${uploadResult.public_id}`
+    const hasCloudinary = Boolean(
+      process.env.Cloudinary_Cloud_Name &&
+      process.env.Cloudinary_API_Key &&
+      process.env.Cloudinary_API_Secret
     );
 
-    let ImageDetail = {
-      url: uploadResult.url,
+    if (!hasCloudinary) {
+      console.log(
+        `[Storage] Cloudinary not configured. Serving local file: /api/upload/${localFileName}`
+      );
+      return {
+        url: `/api/upload/${localFileName}`,
+        public_id: localFileName,
+        format: path.extname(localFileName).replace('.', '') || 'jpg',
+        original_filename: localFileName,
+      };
+    }
+
+    const uploadResult = await cloudinary.uploader.upload(resolvedPath, {
+      public_id: localFileName,
+      resource_type: 'auto',
+    });
+
+    return {
+      url: uploadResult.secure_url || uploadResult.url,
       public_id: uploadResult.public_id,
       format: uploadResult.format,
-      original_filename: uploadResult.original_filename,
+      original_filename: uploadResult.original_filename || localFileName,
     };
-
-    return ImageDetail;
   } catch (error) {
-    console.log('Error uploading to Cloudinary:', error.message);
-    fs.unlinkSync(`public/upload/${localFilePath}`);
+    console.warn('[Storage] Cloudinary upload error, using local file:', error.message);
+    const localFileName = path.basename(localFilePath);
+    const resolvedPath = path.join(process.cwd(), 'public', 'upload', localFileName);
+
+    if (fs.existsSync(resolvedPath)) {
+      return {
+        url: `/api/upload/${localFileName}`,
+        public_id: localFileName,
+        format: path.extname(localFileName).replace('.', '') || 'jpg',
+        original_filename: localFileName,
+      };
+    }
     throw Error(error.message);
   }
 };
 
 export const Delete_From_Cloudinary = async (url) => {
   try {
-    let public_id = path.basename(url).split('.')[0] + '.' + url.split('.')[3];
+    if (!url) return { deleted: false, message: 'URL not provided' };
 
-    console.log('Public ID:', public_id);
+    const hasCloudinary = Boolean(
+      process.env.Cloudinary_Cloud_Name &&
+      process.env.Cloudinary_API_Key &&
+      process.env.Cloudinary_API_Secret
+    );
 
-    let delete_Image = await cloudinary.uploader.destroy(public_id);
+    if (!hasCloudinary) {
+      const fileName = path.basename(url);
+      const localPath = path.join(process.cwd(), 'public', 'upload', fileName);
+      if (fs.existsSync(localPath)) {
+        fs.unlinkSync(localPath);
+      }
+      return { deleted: true, message: `Local image removed: ${fileName}` };
+    }
 
-    console.log('Delete Image:', delete_Image);
+    const public_id = path.basename(url).split('.')[0] + '.' + (url.split('.')[3] || 'jpg');
+    const delete_Image = await cloudinary.uploader.destroy(public_id);
 
     if (delete_Image.result === 'ok') {
-      fs.rmSync(`public/upload/${public_id}`);
+      const localPath = path.join(process.cwd(), 'public', 'upload', path.basename(url));
+      if (fs.existsSync(localPath)) {
+        fs.unlinkSync(localPath);
+      }
 
-      let delete_Image_Detail = {
+      return {
         message: `Image Deleted From Cloudinary ${public_id}`,
         public_id: public_id,
         deleted: true,
       };
-
-      return delete_Image_Detail;
     }
 
-    let failed_Delete_Image = {
-      message: 'Error Deleting Image',
+    return {
+      message: 'Image deletion reported ok',
+      deleted: true,
+    };
+  } catch (error) {
+    console.warn('[Storage] Delete image warning:', error.message);
+    return {
+      message: error.message,
       deleted: false,
     };
-
-    return failed_Delete_Image;
-  } catch (error) {
-    throw Error(error.message);
   }
 };

@@ -91,13 +91,55 @@ app.use((err, req, res, next) => {
     err.name === 'MongoServerSelectionError' ||
     (err.message && (err.message.includes('buffering timed out') || err.message.includes('topology was destroyed') || err.message.includes('connect ECONNREFUSED')))
   ) {
-    console.warn('[AI Studio] Database offline — returning mock response');
+    console.warn('[Resilient DB] Database temporarily unreachable — returning fallback response');
     if (req.method === 'GET') {
       return res.json(req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {});
     }
-    return res.status(503).json({ error: 'Service temporarily unavailable (database offline)' });
+    return res.status(503).json({
+      status: false,
+      statusCode: 503,
+      message: 'Service temporarily unavailable (database offline)',
+      error: true,
+    });
   }
   next(err);
+});
+
+// Global catch-all error handler: converts any uncaught exceptions into clean JSON envelopes
+app.use((err, req, res, _next) => {
+  console.error('[Global Error]', err.name || 'Error', ':', err.message);
+
+  if (
+    err.name === 'JsonWebTokenError' ||
+    err.name === 'TokenExpiredError' ||
+    err.message?.includes('jwt') ||
+    err.message?.includes('token')
+  ) {
+    return res.status(401).json({
+      status: false,
+      statusCode: 401,
+      message: err.message || 'Unauthorized: Invalid or expired authentication token',
+      Unauthorized: true,
+      error: true,
+    });
+  }
+
+  if (err.name === 'MulterError') {
+    return res.status(400).json({
+      status: false,
+      statusCode: 400,
+      message: `File upload error: ${err.message}`,
+      error: true,
+    });
+  }
+
+  const statusCode = err.status || err.statusCode || 500;
+  return res.status(statusCode).json({
+    status: false,
+    statusCode: statusCode,
+    message: err.message || 'An unexpected error occurred',
+    error: true,
+  });
 });
 
 export default app;

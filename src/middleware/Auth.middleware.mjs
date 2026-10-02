@@ -7,12 +7,11 @@ import AuthUtils from '../api/v1/Auth/Auth.utils.mjs';
 class Auth_Middleware {
   Admin = async (req = request, res = response, next) => {
     try {
-      const token = req.cookies?.token || req.headers['authorization'];
-      console.log('Token:', token);
+      const token = AuthUtils.extractRawToken(req);
 
       if (!token) {
-        return res.status(403).json({
-          message: 'Bad Request: Token Not Found',
+        return res.status(401).json({
+          message: 'Unauthorized: Authentication token not provided',
           admin: false,
           Unauthorized: true,
           error: true,
@@ -20,32 +19,48 @@ class Auth_Middleware {
       }
 
       let email = await AuthUtils.DecodeToken(token);
-      console.log('Decoded Email:', email);
 
       if (!email) {
-        return res.status(403).json({
-          message: 'Bad Request: Email Not Found',
+        return res.status(401).json({
+          message: 'Unauthorized: Missing email in token',
           admin: false,
           Unauthorized: true,
           error: true,
         });
       }
 
-      const findRole = await Authentication.checkRole(email);
+      let findRole = null;
+      try {
+        findRole = await Authentication.checkRole(email);
+      } catch (roleError) {
+        console.warn('Role verification failed:', roleError.message);
+        return res.status(403).json({
+          message: 'Access denied: User account not found or unverified',
+          Unauthorized: true,
+          admin: false,
+          error: true,
+        });
+      }
 
       if (findRole !== 'admin') {
         return res.status(403).json({
-          message: 'Bad Request: You are Not Verified Admin',
+          message: 'Access denied: You are not a verified administrator',
           Unauthorized: true,
           admin: false,
           error: true,
         });
       }
 
+      // Attach user details to request object for downstream controllers
+      req.user = { email, role: findRole };
+      req.email = email;
+      req.token = token;
+
       next();
     } catch (error) {
-      console.error('Error in Admin Middleware:', error);
-      return res.status(error.status || 401).json({
+      console.error('Error in Admin Middleware:', error.message);
+      const statusCode = error.status || error.statusCode || 401;
+      return res.status(statusCode).json({
         message: error.message || 'Unauthorized User',
         admin: false,
         Unauthorized: true,
@@ -56,12 +71,11 @@ class Auth_Middleware {
 
   Student = async (req = request, res = response, next) => {
     try {
-      const token = req.cookies?.token || req.headers['authorization'];
-      console.log('Token:', token);
+      const token = AuthUtils.extractRawToken(req);
 
       if (!token) {
-        return res.status(403).json({
-          message: 'Bad Request: Token Not Found',
+        return res.status(401).json({
+          message: 'Unauthorized: Authentication token not provided',
           student: false,
           Unauthorized: true,
           error: true,
@@ -69,32 +83,48 @@ class Auth_Middleware {
       }
 
       let email = await AuthUtils.DecodeToken(token);
-      console.log('Decoded Email:', email);
 
       if (!email) {
-        return res.status(403).json({
-          message: 'Bad Request: Email Not Found',
+        return res.status(401).json({
+          message: 'Unauthorized: Missing email in token',
           student: false,
           Unauthorized: true,
           error: true,
         });
       }
 
-      const findRole = await Authentication.checkRole(email);
+      let findRole = null;
+      try {
+        findRole = await Authentication.checkRole(email);
+      } catch (roleError) {
+        console.warn('Role verification failed:', roleError.message);
+        return res.status(403).json({
+          message: 'Access denied: Student account not found or unverified',
+          Unauthorized: true,
+          student: false,
+          error: true,
+        });
+      }
 
       if (findRole !== 'student') {
         return res.status(403).json({
-          message: 'Bad Request: You are Not Verified Student',
+          message: 'Access denied: You are not a verified student',
           Unauthorized: true,
           student: false,
           error: true,
         });
       }
 
+      // Attach user details to request object for downstream controllers
+      req.user = { email, role: findRole };
+      req.email = email;
+      req.token = token;
+
       next();
     } catch (error) {
-      console.error('Error in Student Middleware:', error);
-      return res.status(error.status || 401).json({
+      console.error('Error in Student Middleware:', error.message);
+      const statusCode = error.status || error.statusCode || 401;
+      return res.status(statusCode).json({
         message: error.message || 'Unauthorized User',
         student: false,
         Unauthorized: true,

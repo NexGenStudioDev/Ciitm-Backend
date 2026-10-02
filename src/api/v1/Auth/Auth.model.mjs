@@ -4,6 +4,7 @@ dotenv.config();
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { Schema, model } from 'mongoose';
+import envConstant from '../../../constant/env.constant.mjs';
 
 const AuthenticationSchema = new Schema(
   {
@@ -65,8 +66,12 @@ AuthenticationSchema.methods.hashPassword = async function (password) {
 AuthenticationSchema.methods.hashEmail = async function (email) {
   try {
     if (email) {
-      const JwtEmail = jwt.sign({ email: email }, process.env.JWT_SECRET, {
-        expiresIn: '7d',
+      const secret =
+        envConstant.JWT_SECRET ||
+        process.env.JWT_SECRET ||
+        'dev_secret_ciitm_jwt_token_2026';
+      const JwtEmail = jwt.sign({ email: email }, secret, {
+        expiresIn: envConstant.JWT_EXPIRES_IN || '7d',
       });
 
       if (JwtEmail) {

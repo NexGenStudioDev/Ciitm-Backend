@@ -113,6 +113,10 @@ app.use(
   '/api/images',
   express.static(path.join(path.resolve(), 'public', 'images'))
 );
+app.use(
+  '/api/upload',
+  express.static(path.join(path.resolve(), 'public', 'upload'))
+);
 
 app.use((req, res, next) => {
   envConstant.isDevelopment

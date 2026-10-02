@@ -13,11 +13,25 @@ import ImageUtils from './Image.utils.mjs';
 class Image_Controller {
   create_Image = async (req, res) => {
     try {
-      const { albumName } = req.body;
-      const { filename } = req.file;
-      const token = req.cookies.token;
+      const { albumName } = req.body || {};
+      const filename = req.file?.filename;
 
-      let email = await AuthUtils.DecodeToken(token);
+      if (!filename) {
+        throw new Error(ImageConstant.IMAGE_NOT_FOUND || 'Image file is required');
+      }
+
+      // Obtain verified email from auth middleware, or extract safely
+      let email = req.user?.email || req.email;
+      if (!email) {
+        const token = AuthUtils.extractRawToken(req);
+        if (token) {
+          email = await AuthUtils.DecodeToken(token);
+        }
+      }
+
+      if (!email) {
+        throw new Error('Unauthorized User: Admin email not identified');
+      }
 
       let find_Admin = await AuthUtils.FindByEmail(email);
 
@@ -46,14 +60,9 @@ class Image_Controller {
         throw new Error(validationError.message);
       }
 
-      // userID: userID,
-      // albumID: albumID,
-      // url: url,
-
       let createdImage = await ImageService.create({
         userID: find_Admin._id.toString(),
         albumID: findAlbum._id.toString(),
-
         url: Cloudinary.url,
       });
 
@@ -90,15 +99,11 @@ class Image_Controller {
         Find_Album._id
       );
 
-      if (!Find_All_Image_Based_On_AlbumId) {
-        throw new Error(ImageConstant.NOT_FOUND);
-      }
-
       SendResponse.success(
         res,
         StatusCodeConstant.ACCEPTED,
         ImageConstant.FIND_IMAGE,
-        Find_All_Image_Based_On_AlbumId
+        Find_All_Image_Based_On_AlbumId || []
       );
     } catch (error) {
       SendResponse.error(res, StatusCodeConstant.BAD_REQUEST, error.message);
@@ -107,11 +112,7 @@ class Image_Controller {
 
   get_All_Image = async (req, res) => {
     try {
-      const Find_All_Image = await ImageUtils.FIND_ALL_IMAGE();
-
-      if (!Find_All_Image) {
-        throw new Error(ImageConstant.NOT_FOUND);
-      }
+      const Find_All_Image = (await ImageUtils.FIND_ALL_IMAGE()) || [];
 
       SendResponse.success(
         res,

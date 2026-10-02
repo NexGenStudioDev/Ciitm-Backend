@@ -19,9 +19,9 @@ class AuthController {
       });
 
       res.cookie('token', HashEmail, {
-        httpOnly: true, // Prevent client-side JS access
-        secure: true, // HTTPS only in prod
-        sameSite: 'Strict', // Prevent CSRF
+        httpOnly: true,
+        secure: envConstant.NODE_ENV === 'production',
+        sameSite: envConstant.NODE_ENV === 'production' ? 'None' : 'Lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -29,8 +29,10 @@ class AuthController {
         res,
         200,
         AuthConstant.USER_CREATED,
-        CreatedUser
-        // HashEmail
+        {
+          ...(CreatedUser?._doc || CreatedUser),
+          token: HashEmail,
+        }
       );
     } catch (error) {
       SendResponse.error(res, 500, error.message || 'Error creating admin');
@@ -71,6 +73,7 @@ class AuthController {
       });
 
       let data = {
+        token: HashEmail,
         user: {
           _id: Find_User._id,
           name: Find_User.name,
@@ -79,7 +82,6 @@ class AuthController {
           profile_image: Find_User.picture,
           role: Find_User.role,
           isActice: Find_User.isActive,
-          // token: HashEmail,
         },
       };
       SendResponse.success(
