@@ -15,6 +15,7 @@ let Env_Validator = Joi.object({
   Razorpay_key: Joi.string().optional(),
   Razorpay_secret: Joi.string().optional(),
   FRONTEND_URL: Joi.string().uri().optional(),
+  ALLOWED_ORIGINS: Joi.string().optional(),
   website_schema: Joi.string().valid('http', 'https').default('http'),
   PORT: Joi.number().integer().min(1).max(65535).default(3000),
 }).unknown(true);
@@ -33,6 +34,7 @@ async function validateEnv() {
     Razorpay_secret: process.env.Razorpay_secret,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     FRONTEND_URL: process.env.FRONTEND_URL,
+    ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
     website_schema: process.env.website_schema || 'http',
     PORT: Number(process.env.PORT || 3000),
   };

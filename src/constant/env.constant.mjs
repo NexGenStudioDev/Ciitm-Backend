@@ -9,7 +9,10 @@ const env_Constant = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   JWT_COOKIE_EXPIRES_IN: process.env.JWT_COOKIE_EXPIRES_IN || '7',
   GMAIL_User: process.env.GMAIL_User || '',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'https://www.growrichmindset.in',
+  ALLOWED_ORIGINS:
+    process.env.ALLOWED_ORIGINS ||
+    'https://www.growrichmindset.in,http://localhost:1420,tauri://localhost,http://tauri.localhost',
   NODE_ENV: process.env.NODE_ENV || 'development',
   REDIS_URL: process.env.REDIS_URL || '',
   GMAIL_Password: process.env.GMAIL_Password || '',

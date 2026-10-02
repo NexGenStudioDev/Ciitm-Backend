@@ -22,7 +22,7 @@ import forgotPasswordRouter from '../api/v1/forget-password/ForgotPassword.route
 import { Fee_Routes } from '../api/v1/Fee/fee.routes.mjs';
 import { TestimonialRouter } from '../api/v1/Testimonial/Testimonial.routes.mjs';
 import { QueueRouter } from '../api/v1/Queue/Queue.routes.mjs';
-import envConstant from '../constant/env.constant.mjs';
+import { createCorsOptions } from '../utils/origin.utils.mjs';
 
 app.use((req, res, next) => {
   console.log('METHOD :', req.method);
@@ -31,31 +31,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const whitelist = new Set([
-  envConstant.FRONTEND_URL?.replace(/\/$/, ''),
-  'http://localhost:5173',
-  'http://localhost:3000',
-]);
-
-app.use(
-  cors({
-    credentials: true,
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-      const cleanOrigin = origin.replace(/\/$/, '');
-      if (
-        !envConstant.NODE_ENV ||
-        envConstant.NODE_ENV === 'development' ||
-        whitelist.has(cleanOrigin) ||
-        cleanOrigin.includes('localhost') ||
-        cleanOrigin.includes('run.app')
-      ) {
-        return callback(null, true);
-      }
-      return callback(null, true);
-    },
-  })
-);
+const corsOptions = createCorsOptions();
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -106,7 +84,8 @@ app.use((err, req, res, next) => {
 });
 
 // Global catch-all error handler: converts any uncaught exceptions into clean JSON envelopes
-app.use((err, req, res, _next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   console.error('[Global Error]', err.name || 'Error', ':', err.message);
 
   if (

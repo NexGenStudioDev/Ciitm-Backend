@@ -5,6 +5,7 @@ import app from '../../routes/app.mjs';
 import validateEnv from '../../validation/Env.Validation.mjs';
 import { db_connect } from '../Db.config.mjs';
 import rabbitMQService from '../../service/rabbitmq.service.mjs';
+import { isOriginAllowed } from '../../utils/origin.utils.mjs';
 
 console.log(path.resolve());
 
@@ -13,9 +14,14 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: (origin, callback) => callback(null, true),
+    origin: (origin, callback) => {
+      if (!origin || isOriginAllowed(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-App-Version'],
     credentials: true,
   },
   transports: ['websocket', 'polling'],
