@@ -11,7 +11,9 @@ let Env_Validator = Joi.object({
   GOOGLE_CLIENT_SECRET: Joi.string().optional(),
   GMAIL_User: Joi.string().email().optional(),
   GMAIL_Password: Joi.string().min(8).optional(),
-  NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'test')
+    .default('development'),
   Razorpay_key: Joi.string().optional(),
   Razorpay_secret: Joi.string().optional(),
   FRONTEND_URL: Joi.string().uri().optional(),

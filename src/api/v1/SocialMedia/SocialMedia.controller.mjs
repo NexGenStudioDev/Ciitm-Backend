@@ -37,7 +37,14 @@ const SocialMediaController = {
 
   async updateLinks(req, res) {
     try {
-      const { linkedin, facebook, instagram, email, number, Number: num } = req.body;
+      const {
+        linkedin,
+        facebook,
+        instagram,
+        email,
+        number,
+        Number: num,
+      } = req.body;
       const phoneNum = number || num;
       let existing = await SocialMedia.findOne();
       if (!existing) {

@@ -79,8 +79,12 @@ describe('CORS and Origin Resolution Suite', () => {
       const mockReqWin = { headers: { origin: 'http://tauri.localhost' } };
       expect(resolveFrontendOrigin(mockReqWin)).toBe('http://tauri.localhost');
 
-      const mockReqProd = { headers: { origin: 'https://www.growrichmindset.in' } };
-      expect(resolveFrontendOrigin(mockReqProd)).toBe('https://www.growrichmindset.in');
+      const mockReqProd = {
+        headers: { origin: 'https://www.growrichmindset.in' },
+      };
+      expect(resolveFrontendOrigin(mockReqProd)).toBe(
+        'https://www.growrichmindset.in'
+      );
     });
 
     it('should fall back to https://www.growrichmindset.in when Origin header is absent (curl, SSR, native calls)', () => {
@@ -91,8 +95,13 @@ describe('CORS and Origin Resolution Suite', () => {
     });
 
     it('should reject unvalidated Origin headers and safely return fallback (preventing open-redirect)', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      const reqMalicious = { headers: { origin: 'https://evil-phishing-site.com' } };
+      delete process.env.FRONTEND_URL;
+      const consoleSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+      const reqMalicious = {
+        headers: { origin: 'https://evil-phishing-site.com' },
+      };
 
       const resolved = resolveFrontendOrigin(reqMalicious);
       expect(resolved).toBe(DEFAULT_FALLBACK_ORIGIN);
@@ -190,7 +199,9 @@ describe('CORS and Origin Resolution Suite', () => {
     });
 
     it('should NOT set Access-Control-Allow-Origin for disallowed origins', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
 
       const res = await fetch(`${baseUrl}/api/test-cors`, {
         headers: { Origin: 'http://unauthorized-domain.com' },
@@ -226,7 +237,9 @@ describe('CORS and Origin Resolution Suite', () => {
     });
 
     it('should fail preflight for disallowed origin (no ACAO header emitted)', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
 
       const res = await fetch(`${baseUrl}/api/test-cors`, {
         method: 'OPTIONS',
@@ -243,7 +256,9 @@ describe('CORS and Origin Resolution Suite', () => {
     });
 
     it('should log rejected Origin: null in development', async () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
       const previousNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
 

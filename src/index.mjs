@@ -94,9 +94,10 @@ app.get('/', (req, res) => {
       name: 'CIITM Backend API',
       status: 'online',
       port: 3000,
-      documentation: 'See README.md for complete API specifications and examples',
+      documentation:
+        'See README.md for complete API specifications and examples',
       health: '/api/health',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -146,14 +147,20 @@ app.use((err, req, res, next) => {
   ) {
     console.warn('[AI Studio] Database offline — returning fallback response');
     if (req.method === 'GET') {
-      return res.json(req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {});
+      return res.json(
+        req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {}
+      );
     }
-    return res.status(503).json({ error: 'Service temporarily unavailable (database offline)' });
+    return res
+      .status(503)
+      .json({ error: 'Service temporarily unavailable (database offline)' });
   }
 
   if (err) {
     console.error(err.stack || err);
-    return res.status(err.status || 500).json({ error: err.message || 'Something broke!' });
+    return res
+      .status(err.status || 500)
+      .json({ error: err.message || 'Something broke!' });
   }
 
   next();

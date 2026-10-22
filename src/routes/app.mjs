@@ -67,11 +67,18 @@ app.use((err, req, res, next) => {
     err.name === 'MongooseError' ||
     err.name === 'MongoNetworkError' ||
     err.name === 'MongoServerSelectionError' ||
-    (err.message && (err.message.includes('buffering timed out') || err.message.includes('topology was destroyed') || err.message.includes('connect ECONNREFUSED')))
+    (err.message &&
+      (err.message.includes('buffering timed out') ||
+        err.message.includes('topology was destroyed') ||
+        err.message.includes('connect ECONNREFUSED')))
   ) {
-    console.warn('[Resilient DB] Database temporarily unreachable — returning fallback response');
+    console.warn(
+      '[Resilient DB] Database temporarily unreachable — returning fallback response'
+    );
     if (req.method === 'GET') {
-      return res.json(req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {});
+      return res.json(
+        req.path.endsWith('s') || req.path.endsWith('s/') ? [] : {}
+      );
     }
     return res.status(503).json({
       status: false,
@@ -97,7 +104,8 @@ app.use((err, req, res, next) => {
     return res.status(401).json({
       status: false,
       statusCode: 401,
-      message: err.message || 'Unauthorized: Invalid or expired authentication token',
+      message:
+        err.message || 'Unauthorized: Invalid or expired authentication token',
       Unauthorized: true,
       error: true,
     });

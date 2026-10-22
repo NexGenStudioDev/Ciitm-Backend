@@ -18,9 +18,12 @@ export let Update_Status_Validation = joi.object({
     .messages({
       'string.base': 'Application Status should be a type of text',
       'string.empty': 'Application Status cannot be an empty field',
-      'string.min': 'Application Status should have a minimum length of {#limit}',
-      'string.valid': 'Application Status should be one of \'Pending\', \'Verified\', \'Approved\', \'Rejected\'',
-      'string.max': 'Application Status should have a maximum length of {#limit}',
+      'string.min':
+        'Application Status should have a minimum length of {#limit}',
+      'string.valid':
+        "Application Status should be one of 'Pending', 'Verified', 'Approved', 'Rejected'",
+      'string.max':
+        'Application Status should have a maximum length of {#limit}',
       'any.required': 'Application Status is a required field',
     }),
 });

@@ -17,7 +17,9 @@ class Image_Controller {
       const filename = req.file?.filename;
 
       if (!filename) {
-        throw new Error(ImageConstant.IMAGE_NOT_FOUND || 'Image file is required');
+        throw new Error(
+          ImageConstant.IMAGE_NOT_FOUND || 'Image file is required'
+        );
       }
 
       // Obtain verified email from auth middleware, or extract safely
