@@ -103,9 +103,7 @@ describe('AuthService', () => {
 });
 
 describe('AuthUtility Token Extraction & Decoding Suite', () => {
-  const TEST_SECRET =
-    process.env.JWT_SECRET ||
-    'sfhdjah4hsdf5865dfba_duss545864_sdhv7445dsx_main_hu_Coder_12345';
+  const TEST_SECRET = process.env.JWT_SECRET || 'test_jwt_secret_ciitm_key';
 
   it('should extract raw token from Authorization header with Bearer prefix', () => {
     const req = { headers: { authorization: 'Bearer test.token.here' } };

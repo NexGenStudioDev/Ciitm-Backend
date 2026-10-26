@@ -47,17 +47,20 @@ class AuthController {
 
       console.log('Find_User', Find_User);
 
+      const expectedAdminEmail = envConstant.ADMIN_EMAIL || 'admin@gmail.com';
+      const expectedAdminPassword = envConstant.ADMIN_PASSWORD || 'Admin@123';
+
       if (
         !Find_User &&
-        email === 'admin@gmail.com' &&
-        password === 'Admin@123'
+        email === expectedAdminEmail &&
+        password === expectedAdminPassword
       ) {
         try {
           const hashedPassword =
-            await Authentication_Instance.hashPassword('Admin@123');
+            await Authentication_Instance.hashPassword(expectedAdminPassword);
           Find_User = await AuthenticationSchema.create({
             name: 'Prof. R. K. Sharma',
-            email: 'admin@gmail.com',
+            email: expectedAdminEmail,
             password: hashedPassword,
             role: 'admin',
             email_verified: true,
@@ -67,7 +70,7 @@ class AuthController {
           Find_User = {
             _id: '6740b2f5a8c43d9124a87211',
             name: 'Prof. R. K. Sharma',
-            email: 'admin@gmail.com',
+            email: expectedAdminEmail,
             role: 'admin',
             email_verified: true,
             isActive: true,
@@ -87,13 +90,13 @@ class AuthController {
           Find_User.password
         );
       } catch {
-        if (email === 'admin@gmail.com' && password === 'Admin@123') {
+        if (email === expectedAdminEmail && password === expectedAdminPassword) {
           ComparePassword = true;
         }
       }
 
       if (!ComparePassword) {
-        if (email === 'admin@gmail.com' && password === 'Admin@123') {
+        if (email === expectedAdminEmail && password === expectedAdminPassword) {
           ComparePassword = true;
         } else {
           return res.status(400).json({ message: 'Invalid Password' });

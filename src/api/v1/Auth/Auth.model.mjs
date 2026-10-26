@@ -66,10 +66,7 @@ AuthenticationSchema.methods.hashPassword = async function (password) {
 AuthenticationSchema.methods.hashEmail = async function (email) {
   try {
     if (email) {
-      const secret =
-        envConstant.JWT_SECRET ||
-        process.env.JWT_SECRET ||
-        'sfhdjah4hsdf5865dfba_duss545864_sdhv7445dsx_main_hu_Coder_12345';
+      const secret = envConstant.JWT_SECRET || process.env.JWT_SECRET;
       const JwtEmail = jwt.sign(
         { email: email, role: this.role || 'admin' },
         secret,

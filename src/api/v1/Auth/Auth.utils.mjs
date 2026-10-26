@@ -131,9 +131,6 @@ class AuthUtility {
     const candidateSecrets = [
       env_Constant.JWT_SECRET,
       process.env.JWT_SECRET,
-      'sfhdjah4hsdf5865dfba_duss545864_sdhv7445dsx_main_hu_Coder_12345',
-      'dev_secret_ciitm_jwt_token_2026',
-      'your_super_secret_jwt_key',
     ].filter(Boolean);
 
     let decoded = null;
