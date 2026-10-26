@@ -30,7 +30,8 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
  
     res.status(200).json({
-      name: 'CIITM Backend API',
+      name: 'Academiq Backend API Engine',
+      app: 'Academiq OS',
       status: 'online',
       port: 3000,
       timestamp: new Date().toISOString(),

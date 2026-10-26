@@ -1,6 +1,7 @@
 {
-  "name": "backend",
-  "version": "0.0.0",
+  "name": "academiq-backend",
+  "description": "Academiq — Institutional API Engine, Queue Services & Real-time Sockets",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
