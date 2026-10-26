@@ -4,7 +4,7 @@ const FrontendSchema = new Schema({
   logo: {
     type: String,
     required: true,
-    default: 'CIITM',
+    default: 'EDNORA',
   },
 
   landingPage: {

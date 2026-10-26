@@ -87,7 +87,7 @@ class Status_Controller {
 
       if (applicationStatus === 'Approved') {
         // Generate a more secure password
-        const password = 'Ciitm@' + crypto.randomBytes(8).toString('hex');
+        const password = 'Ednora@' + crypto.randomBytes(8).toString('hex');
 
         let Sign_Up_new_Student = await AuthService.CreateUser({
           name:

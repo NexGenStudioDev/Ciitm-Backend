@@ -56,7 +56,7 @@ class AdmissionController {
         twelfthBoard: (data.twelfthBoard || 'CBSE').toUpperCase(),
         twelfthGrade: (data.twelfthGrade || 'A').toUpperCase(),
         mode: data.mode || 'Offline',
-        university: (data.university || 'CIITM').toUpperCase(),
+        university: (data.university || 'EDNORA').toUpperCase(),
         courseName: (data.courseName || data.course || 'BCA').toUpperCase(),
         semester: Number(data.semester || 1),
       };

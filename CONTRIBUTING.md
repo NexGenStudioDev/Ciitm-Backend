@@ -1,6 +1,6 @@
-# Contributing to CIITM Backend 🤝
+# Contributing to Ednora Backend 🤝
 
-Thank you for your interest in contributing to the CIITM Backend project! We welcome contributions from the community while maintaining the integrity and vision of this educational technology platform.
+Thank you for your interest in contributing to the Ednora Backend project! We welcome contributions from the community while maintaining the integrity and vision of this educational technology platform.
 
 ## 📋 Table of Contents
 
