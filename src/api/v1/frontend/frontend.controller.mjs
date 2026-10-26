@@ -52,6 +52,24 @@ class FrontendController {
       );
     }
   }
+
+  async update(req, res) {
+    try {
+      const updatedFrontend = await frontendService.Update_Frontend(req.body);
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        'Frontend settings updated successfully',
+        updatedFrontend
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        error.status || StatusCodeConstant.INTERNAL_SERVER_ERROR,
+        error.message
+      );
+    }
+  }
 }
 
 export default new FrontendController();

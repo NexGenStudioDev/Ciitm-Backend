@@ -175,6 +175,7 @@ export const createCorsOptions = () => {
       'X-Requested-With',
     ],
     exposedHeaders: ['set-cookie'],
+    
     optionsSuccessStatus: 204,
   };
 };

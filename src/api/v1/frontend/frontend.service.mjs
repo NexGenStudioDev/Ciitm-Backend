@@ -273,6 +273,18 @@ class FrontendService {
       return new Error(error.message || frontendConstant.NOT_CREATED);
     }
   };
+
+  Update_Frontend = async (data) => {
+    let frontend = await Frontend.findOne();
+    if (!frontend) {
+      frontend = await this.Created_Frontend();
+    }
+    if (data && typeof data === 'object') {
+      Object.assign(frontend, data);
+      await frontend.save();
+    }
+    return frontend;
+  };
 }
 
 export default new FrontendService();
