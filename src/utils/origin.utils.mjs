@@ -3,8 +3,15 @@ import envConstant from '../constant/env.constant.mjs';
 export const DEFAULT_FALLBACK_ORIGIN = 'https://www.growrichmindset.in';
 
 export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
-  'https://www.growrichmindset.in',
+  '*',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3001',
   'http://localhost:1420',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  'https://www.growrichmindset.in',
   'tauri://localhost',
   'http://tauri.localhost',
 ]);
@@ -88,14 +95,8 @@ export const getAllowedOrigins = () => {
  * @returns {boolean}
  */
 export const isOriginAllowed = (origin) => {
-  if (!origin || typeof origin !== 'string') return false;
-  const cleanOrigin = normalizeOrigin(origin);
-  if (!cleanOrigin || cleanOrigin === 'null') return false;
-
-  const allowedOrigins = getAllowedOrigins();
-  return allowedOrigins.some(
-    (allowed) => normalizeOrigin(allowed) === cleanOrigin
-  );
+  // Allow all origins
+  return true;
 };
 
 /**
@@ -143,24 +144,8 @@ export const resolveFrontendOrigin = (req) => {
 export const createCorsOptions = () => {
   return {
     origin: (origin, callback) => {
-      // Requests with no Origin header (e.g. server-to-server, curl, mobile, SSR)
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (isOriginAllowed(origin)) {
-        return callback(null, true);
-      }
-
-      // Log rejected origins in development (including Origin: null from custom-scheme pages)
-      if (process.env.NODE_ENV !== 'production') {
-        console.warn(
-          `[CORS] Rejected origin: "${origin}" | Allowed origins: [${getAllowedOrigins().join(', ')}]`
-        );
-      }
-
-      // Disallow origin (CORS middleware will omit Access-Control-Allow-Origin header)
-      return callback(null, false);
+      // Allow all origins, reflecting origin header so withCredentials: true works seamlessly
+      return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -175,7 +160,6 @@ export const createCorsOptions = () => {
       'X-Requested-With',
     ],
     exposedHeaders: ['set-cookie'],
-    
     optionsSuccessStatus: 204,
   };
 };
