@@ -18,6 +18,8 @@ const env_Constant = {
   GMAIL_Password: process.env.GMAIL_Password || '',
   isDevelopment: (process.env.NODE_ENV || 'development') === 'development',
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@gmail.com',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'Admin@123',
 };
 
 export default Object.freeze(env_Constant);

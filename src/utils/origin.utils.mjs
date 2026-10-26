@@ -17,7 +17,12 @@ export const DEFAULT_ALLOWED_ORIGINS = Object.freeze([
 export const isValidOriginFormat = (val) => {
   if (!val || typeof val !== 'string') return false;
   const trimmed = val.trim();
-  if (trimmed.startsWith('#') || trimmed.includes(' ') || trimmed === 'null' || trimmed === 'undefined') {
+  if (
+    trimmed.startsWith('#') ||
+    trimmed.includes(' ') ||
+    trimmed === 'null' ||
+    trimmed === 'undefined'
+  ) {
     return false;
   }
   return /^https?:\/\/|^tauri:\/\//i.test(trimmed);
@@ -38,8 +43,8 @@ export const normalizeOrigin = (origin) => {
  * @returns {string}
  */
 export const getFallbackOrigin = () => {
-  const envUrl = process.env.FRONTEND_URL || envConstant.FRONTEND_URL || '';
-  if (isValidOriginFormat(envUrl)) {
+  const envUrl = process.env.FRONTEND_URL;
+  if (envUrl && isValidOriginFormat(envUrl)) {
     return normalizeOrigin(envUrl);
   }
   return DEFAULT_FALLBACK_ORIGIN;
@@ -51,7 +56,8 @@ export const getFallbackOrigin = () => {
  * @returns {string[]}
  */
 export const getAllowedOrigins = () => {
-  const rawAllowed = process.env.ALLOWED_ORIGINS || envConstant.ALLOWED_ORIGINS || '';
+  const rawAllowed =
+    process.env.ALLOWED_ORIGINS || envConstant.ALLOWED_ORIGINS || '';
   const fallbackUrl = getFallbackOrigin();
 
   let origins = [];
@@ -87,7 +93,9 @@ export const isOriginAllowed = (origin) => {
   if (!cleanOrigin || cleanOrigin === 'null') return false;
 
   const allowedOrigins = getAllowedOrigins();
-  return allowedOrigins.some((allowed) => normalizeOrigin(allowed) === cleanOrigin);
+  return allowedOrigins.some(
+    (allowed) => normalizeOrigin(allowed) === cleanOrigin
+  );
 };
 
 /**
@@ -167,6 +175,7 @@ export const createCorsOptions = () => {
       'X-Requested-With',
     ],
     exposedHeaders: ['set-cookie'],
+    
     optionsSuccessStatus: 204,
   };
 };

@@ -17,7 +17,9 @@ class Image_Controller {
       const filename = req.file?.filename;
 
       if (!filename) {
-        throw new Error(ImageConstant.IMAGE_NOT_FOUND || 'Image file is required');
+        throw new Error(
+          ImageConstant.IMAGE_NOT_FOUND || 'Image file is required'
+        );
       }
 
       // Obtain verified email from auth middleware, or extract safely
@@ -119,6 +121,25 @@ class Image_Controller {
         StatusCodeConstant.ACCEPTED,
         ImageConstant.FIND_ALL_IMAGE,
         Find_All_Image
+      );
+    } catch (error) {
+      SendResponse.error(res, StatusCodeConstant.BAD_REQUEST, error.message);
+    }
+  };
+
+  delete_Image = async (req, res) => {
+    try {
+      const { imageId, imgId } = req.params;
+      const targetId = imageId || imgId;
+      if (!targetId) {
+        throw new Error('Image ID is required');
+      }
+      const deletedImage = await ImageService.delete(targetId);
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        'Image deleted successfully',
+        deletedImage
       );
     } catch (error) {
       SendResponse.error(res, StatusCodeConstant.BAD_REQUEST, error.message);

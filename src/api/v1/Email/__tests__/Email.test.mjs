@@ -37,7 +37,9 @@ describe('EmailService', () => {
   });
 
   it('should handle template generation failure', async () => {
-    PaymentConfirmationTemplate.mockRejectedValueOnce(new Error('Template render error'));
+    PaymentConfirmationTemplate.mockRejectedValueOnce(
+      new Error('Template render error')
+    );
 
     await expect(
       EmailService.sendPaymentConfirmation({

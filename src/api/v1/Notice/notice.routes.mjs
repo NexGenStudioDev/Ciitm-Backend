@@ -11,5 +11,10 @@ router.post(
   noticeController.Create
 );
 router.get('/v1/notice/find', noticeController.Find);
+router.delete(
+  '/v1/notice/delete/:id',
+  AuthMiddleware.Admin,
+  noticeController.Delete
+);
 
 export { router as NoticeRouter };

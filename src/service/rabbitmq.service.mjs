@@ -37,7 +37,9 @@ class RabbitMQService extends EventEmitter {
     const url = process.env.RABBITMQ_URL || process.env.AMQP_URL;
 
     if (!url) {
-      console.log('ℹ️ RABBITMQ_URL not provided. Using in-memory fallback message queue.');
+      console.log(
+        'ℹ️ RABBITMQ_URL not provided. Using in-memory fallback message queue.'
+      );
       this.stats.mode = 'in-memory (standalone)';
       this.isConnecting = false;
       return;
@@ -65,13 +67,19 @@ class RabbitMQService extends EventEmitter {
       });
 
       this.connection.on('close', () => {
-        console.warn('⚠️ RabbitMQ connection closed. Switching to in-memory queue fallback.');
+        console.warn(
+          '⚠️ RabbitMQ connection closed. Switching to in-memory queue fallback.'
+        );
         this.isConnected = false;
         this.stats.connected = false;
         this.stats.mode = 'in-memory (fallback)';
       });
     } catch (error) {
-      console.warn('⚠️ RabbitMQ server unavailable (' + error.message + '). Active fallback in-memory message queue initialized.');
+      console.warn(
+        '⚠️ RabbitMQ server unavailable (' +
+          error.message +
+          '). Active fallback in-memory message queue initialized.'
+      );
       this.isConnected = false;
       this.stats.connected = false;
       this.stats.mode = 'in-memory (fallback)';
@@ -81,11 +89,20 @@ class RabbitMQService extends EventEmitter {
   }
 
   async publish(queueName, message, options = {}) {
+    let parsedData = message;
+    if (typeof message === 'string') {
+      try {
+        parsedData = JSON.parse(message);
+      } catch {
+        parsedData = message;
+      }
+    }
+
     const enrichedMessage = {
       id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
       timestamp: new Date().toISOString(),
       queue: queueName,
-      data: typeof message === 'string' ? JSON.parse(message || '{}') : message,
+      data: parsedData,
     };
 
     this.stats.messagesPublished++;
@@ -93,13 +110,24 @@ class RabbitMQService extends EventEmitter {
     if (this.isConnected && this.channel) {
       try {
         await this.channel.assertQueue(queueName, { durable: true });
-        this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(enrichedMessage)), {
-          persistent: true,
-          ...options,
-        });
-        return { success: true, mode: 'rabbitmq', messageId: enrichedMessage.id };
+        this.channel.sendToQueue(
+          queueName,
+          Buffer.from(JSON.stringify(enrichedMessage)),
+          {
+            persistent: true,
+            ...options,
+          }
+        );
+        return {
+          success: true,
+          mode: 'rabbitmq',
+          messageId: enrichedMessage.id,
+        };
       } catch (err) {
-        console.warn('RabbitMQ publish error, falling back to in-memory queue:', err.message);
+        console.warn(
+          'RabbitMQ publish error, falling back to in-memory queue:',
+          err.message
+        );
       }
     }
 
@@ -120,7 +148,12 @@ class RabbitMQService extends EventEmitter {
         await this.channel.consume(queueName, async (msg) => {
           if (msg !== null) {
             try {
-              const content = JSON.parse(msg.content.toString());
+              let content;
+              try {
+                content = JSON.parse(msg.content.toString());
+              } catch {
+                content = msg.content.toString();
+              }
               await handler(content);
               this.channel.ack(msg);
               this.stats.messagesProcessed++;
@@ -132,7 +165,10 @@ class RabbitMQService extends EventEmitter {
           }
         });
       } catch (err) {
-        console.warn('Failed to register RabbitMQ consumer, using in-memory listener:', err.message);
+        console.warn(
+          'Failed to register RabbitMQ consumer, using in-memory listener:',
+          err.message
+        );
       }
     }
 

@@ -6,7 +6,10 @@ import envConstant from '../constant/env.constant.mjs';
 mongoose.set('bufferCommands', false);
 
 const connectToDatabase = async () => {
-  const connectionString = envConstant.MONGO_URI || process.env.MONGO_URL || 'mongodb://localhost:27017/ciitm';
+  const connectionString =
+    envConstant.MONGO_URI ||
+    process.env.MONGO_URL ||
+    'mongodb://localhost:27017/ciitm';
 
   try {
     lolcat.options.seed = Math.round(Math.random() * 1000);
@@ -17,7 +20,9 @@ const connectToDatabase = async () => {
     });
     lolcat.fromString('Connected to Db!');
   } catch {
-    console.warn('[AI Studio] MongoDB not connected — offline mode active. Connect a database via integrations menu or set MONGO_URL.');
+    console.warn(
+      '[AI Studio] MongoDB not connected — offline mode active. Connect a database via integrations menu or set MONGO_URL.'
+    );
   }
 };
 
@@ -26,7 +31,10 @@ const db_connect = async () => {
   try {
     await connectToDatabase();
   } catch (error) {
-    console.warn('[AI Studio] Database connection initialization warning:', error.message);
+    console.warn(
+      '[AI Studio] Database connection initialization warning:',
+      error.message
+    );
   }
 };
 

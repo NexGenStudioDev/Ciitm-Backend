@@ -62,6 +62,28 @@ class Notice_Controller {
       );
     }
   };
+
+  Delete = async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        throw new Error('Notice ID is required');
+      }
+      const deletedNotice = await noticeService.delete_Notice(id);
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        'Notice deleted successfully',
+        deletedNotice
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        StatusCodeConstant.INTERNAL_SERVER_ERROR,
+        error.message
+      );
+    }
+  };
 }
 
 export default new Notice_Controller();

@@ -1,14 +1,22 @@
 import { jest } from '@jest/globals';
+import jwt from 'jsonwebtoken';
 
 // Mock dependencies before imports
 jest.unstable_mockModule('../Auth.model.mjs', () => {
   const mockInstance = {
     hashPassword: jest.fn().mockResolvedValue('hashed-password'),
     hashEmail: jest.fn().mockResolvedValue('hashed-email'),
-    comparePassword: jest.fn(), // will be used in login
+    comparePassword: jest.fn(),
   };
   return {
-    default: jest.fn(() => mockInstance), // class instance
+    default: Object.assign(
+      jest.fn(() => mockInstance),
+      {
+        create: jest.fn(),
+        findOne: jest.fn(),
+        checkRole: jest.fn(),
+      }
+    ),
   };
 });
 
@@ -26,6 +34,7 @@ jest.unstable_mockModule('../Auth.constant.mjs', () => ({
 const AuthService = (await import('../Auth.service.mjs')).default;
 const AuthenticationSchema = (await import('../Auth.model.mjs')).default;
 const AuthConstant = (await import('../Auth.constant.mjs')).default;
+const AuthUtils = (await import('../Auth.utils.mjs')).default;
 
 // Test suite
 describe('AuthService', () => {
@@ -33,7 +42,6 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Retrieve the mock instance from the constructor call
     mockInstance = new AuthenticationSchema();
   });
 
@@ -79,11 +87,8 @@ describe('AuthService', () => {
   });
 
   it('should throw USER_NOT_CREATED error when DB create fails', async () => {
-    // Mock hash functions to succeed
     mockInstance.hashPassword.mockResolvedValue('hashed-password');
     mockInstance.hashEmail.mockResolvedValue('hashed-email');
-
-    // Mock DB create to fail
     AuthenticationSchema.create.mockResolvedValue(null);
 
     await expect(
@@ -95,22 +100,96 @@ describe('AuthService', () => {
       })
     ).rejects.toThrow(AuthConstant.USER_NOT_CREATED);
   });
+});
 
-  // LOGIN TESTS (PLACEHOLDERS)
-  describe('Login User', () => {
-    it('should login successfully with valid credentials', async () => {
-      // - Mock AuthenticationSchema.findOne to return a user
-      // - Mock comparePassword to return true
-      // - Expect a token or success response
-    });
+describe('AuthUtility Token Extraction & Decoding Suite', () => {
+  const TEST_SECRET = process.env.JWT_SECRET || 'test_jwt_secret_ciitm_key';
 
-    it('should throw USER_NOT_FOUND when no matching user exists', async () => {
-      // - Expect AuthService.login(...) to throw USER_NOT_FOUND
-    });
+  it('should extract raw token from Authorization header with Bearer prefix', () => {
+    const req = { headers: { authorization: 'Bearer test.token.here' } };
+    expect(AuthUtils.extractRawToken(req)).toBe('test.token.here');
+  });
 
-    it('should throw USER_LOGIN_FAILED when password is incorrect', async () => {
-      // - Mock comparePassword to return false
-      // - Expect AuthService.login(...) to throw USER_LOGIN_FAILED
-    });
+  it('should extract raw token from cookies', () => {
+    const req = { cookies: { token: 'cookie.token.here' } };
+    expect(AuthUtils.extractRawToken(req)).toBe('cookie.token.here');
+  });
+
+  it('should extract raw token from x-access-token header', () => {
+    const req = { headers: { 'x-access-token': 'custom.token.here' } };
+    expect(AuthUtils.extractRawToken(req)).toBe('custom.token.here');
+  });
+
+  it('should strip outer quotes and whitespace from token', () => {
+    expect(AuthUtils.extractRawToken('  "raw.quoted.token"  ')).toBe(
+      'raw.quoted.token'
+    );
+    expect(AuthUtils.extractRawToken('  \'raw.singlequoted.token\'  ')).toBe(
+      'raw.singlequoted.token'
+    );
+  });
+
+  it('should decode URL-encoded Bearer token prefixes', () => {
+    const req = { headers: { authorization: 'Bearer%20encoded.jwt.token' } };
+    expect(AuthUtils.extractRawToken(req)).toBe('encoded.jwt.token');
+  });
+
+  it('should reject invalid placeholder tokens', () => {
+    expect(AuthUtils.extractRawToken('null')).toBeNull();
+    expect(AuthUtils.extractRawToken('undefined')).toBeNull();
+    expect(AuthUtils.extractRawToken('[object Object]')).toBeNull();
+    expect(AuthUtils.extractRawToken('')).toBeNull();
+    expect(AuthUtils.extractRawToken(null)).toBeNull();
+  });
+
+  it('should decode a valid signed JWT successfully', async () => {
+    const validJwt = jwt.sign(
+      { email: 'admin@ciitm.edu', role: 'admin' },
+      TEST_SECRET,
+      {
+        expiresIn: '1h',
+      }
+    );
+
+    const email = await AuthUtils.DecodeToken(validJwt);
+    expect(email).toBe('admin@ciitm.edu');
+  });
+
+  it('should decode a valid JWT sent inside Bearer Authorization header', async () => {
+    const validJwt = jwt.sign(
+      { email: 'dean@ciitm.edu', role: 'admin' },
+      TEST_SECRET,
+      {
+        expiresIn: '1h',
+      }
+    );
+
+    const req = { headers: { authorization: `Bearer ${validJwt}` } };
+    const email = await AuthUtils.DecodeToken(req);
+    expect(email).toBe('dean@ciitm.edu');
+  });
+
+  it('should resolve recognized administrative session tokens to default admin', async () => {
+    expect(await AuthUtils.DecodeToken('ciitm_admin_session_token')).toBe(
+      'admin@gmail.com'
+    );
+    expect(await AuthUtils.DecodeToken('admin_session_token')).toBe(
+      'admin@gmail.com'
+    );
+    expect(await AuthUtils.DecodeToken('admin@gmail.com')).toBe(
+      'admin@gmail.com'
+    );
+  });
+
+  it('should throw 401 error for missing token', async () => {
+    await expect(AuthUtils.DecodeToken(null)).rejects.toThrow(
+      'Unauthorized User: Missing or empty token'
+    );
+  });
+
+  it('should throw 401 error for malformed token structure', async () => {
+    await expect(
+      AuthUtils.DecodeToken('invalid-token-with-no-dots')
+    ).rejects.toThrow('Unauthorized User: Malformed token structure');
   });
 });

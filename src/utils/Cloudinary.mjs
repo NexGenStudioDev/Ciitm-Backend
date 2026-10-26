@@ -27,8 +27,8 @@ export const uploadOnCloudinary = async (localFilePath) => {
 
     const hasCloudinary = Boolean(
       process.env.Cloudinary_Cloud_Name &&
-      process.env.Cloudinary_API_Key &&
-      process.env.Cloudinary_API_Secret
+        process.env.Cloudinary_API_Key &&
+        process.env.Cloudinary_API_Secret
     );
 
     if (!hasCloudinary) {
@@ -55,9 +55,17 @@ export const uploadOnCloudinary = async (localFilePath) => {
       original_filename: uploadResult.original_filename || localFileName,
     };
   } catch (error) {
-    console.warn('[Storage] Cloudinary upload error, using local file:', error.message);
+    console.warn(
+      '[Storage] Cloudinary upload error, using local file:',
+      error.message
+    );
     const localFileName = path.basename(localFilePath);
-    const resolvedPath = path.join(process.cwd(), 'public', 'upload', localFileName);
+    const resolvedPath = path.join(
+      process.cwd(),
+      'public',
+      'upload',
+      localFileName
+    );
 
     if (fs.existsSync(resolvedPath)) {
       return {
@@ -77,8 +85,8 @@ export const Delete_From_Cloudinary = async (url) => {
 
     const hasCloudinary = Boolean(
       process.env.Cloudinary_Cloud_Name &&
-      process.env.Cloudinary_API_Key &&
-      process.env.Cloudinary_API_Secret
+        process.env.Cloudinary_API_Key &&
+        process.env.Cloudinary_API_Secret
     );
 
     if (!hasCloudinary) {
@@ -90,11 +98,17 @@ export const Delete_From_Cloudinary = async (url) => {
       return { deleted: true, message: `Local image removed: ${fileName}` };
     }
 
-    const public_id = path.basename(url).split('.')[0] + '.' + (url.split('.')[3] || 'jpg');
+    const public_id =
+      path.basename(url).split('.')[0] + '.' + (url.split('.')[3] || 'jpg');
     const delete_Image = await cloudinary.uploader.destroy(public_id);
 
     if (delete_Image.result === 'ok') {
-      const localPath = path.join(process.cwd(), 'public', 'upload', path.basename(url));
+      const localPath = path.join(
+        process.cwd(),
+        'public',
+        'upload',
+        path.basename(url)
+      );
       if (fs.existsSync(localPath)) {
         fs.unlinkSync(localPath);
       }
