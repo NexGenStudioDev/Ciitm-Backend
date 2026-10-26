@@ -126,7 +126,7 @@ describe('AuthUtility Token Extraction & Decoding Suite', () => {
     expect(AuthUtils.extractRawToken('  "raw.quoted.token"  ')).toBe(
       'raw.quoted.token'
     );
-    expect(AuthUtils.extractRawToken("  'raw.singlequoted.token'  ")).toBe(
+    expect(AuthUtils.extractRawToken('  \'raw.singlequoted.token\'  ')).toBe(
       'raw.singlequoted.token'
     );
   });

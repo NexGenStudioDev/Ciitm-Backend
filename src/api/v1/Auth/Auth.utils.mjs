@@ -60,7 +60,7 @@ class AuthUtility {
       token = token.trim();
       if (
         (token.startsWith('"') && token.endsWith('"')) ||
-        (token.startsWith("'") && token.endsWith("'"))
+        (token.startsWith('\'') && token.endsWith('\''))
       ) {
         token = token.slice(1, -1).trim();
       }

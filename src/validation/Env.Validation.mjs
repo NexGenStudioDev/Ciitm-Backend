@@ -20,6 +20,7 @@ let Env_Validator = Joi.object({
   ALLOWED_ORIGINS: Joi.string().optional(),
   website_schema: Joi.string().valid('http', 'https').default('http'),
   PORT: Joi.number().integer().min(1).max(65535).default(3000),
+  RABBITMQ_URL: Joi.string().optional(),
 }).unknown(true);
 
 async function validateEnv() {
@@ -39,6 +40,7 @@ async function validateEnv() {
     ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
     website_schema: process.env.website_schema || 'http',
     PORT: Number(process.env.PORT || 3000),
+    RABBITMQ_URL: process.env.RABBITMQ_URL || process.env.AMQP_URL,
   };
 
   try {

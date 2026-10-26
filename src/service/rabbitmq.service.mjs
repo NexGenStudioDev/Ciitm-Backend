@@ -89,11 +89,20 @@ class RabbitMQService extends EventEmitter {
   }
 
   async publish(queueName, message, options = {}) {
+    let parsedData = message;
+    if (typeof message === 'string') {
+      try {
+        parsedData = JSON.parse(message);
+      } catch {
+        parsedData = message;
+      }
+    }
+
     const enrichedMessage = {
       id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
       timestamp: new Date().toISOString(),
       queue: queueName,
-      data: typeof message === 'string' ? JSON.parse(message || '{}') : message,
+      data: parsedData,
     };
 
     this.stats.messagesPublished++;
@@ -139,7 +148,12 @@ class RabbitMQService extends EventEmitter {
         await this.channel.consume(queueName, async (msg) => {
           if (msg !== null) {
             try {
-              const content = JSON.parse(msg.content.toString());
+              let content;
+              try {
+                content = JSON.parse(msg.content.toString());
+              } catch {
+                content = msg.content.toString();
+              }
               await handler(content);
               this.channel.ack(msg);
               this.stats.messagesProcessed++;
