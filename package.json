@@ -1,6 +1,7 @@
 {
-  "name": "backend",
-  "version": "0.0.0",
+  "name": "ednora-backend",
+  "description": "Ednora API Engine — Where Knowledge Finds Its Future.",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {

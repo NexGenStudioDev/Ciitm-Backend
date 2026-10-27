@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 import SocialMedia from './SocialMedia.model.mjs';
 
 const defaultLinks = {
-  linkedin: 'https://linkedin.com/school/ciitm',
-  facebook: 'https://facebook.com/ciitm',
-  instagram: 'https://instagram.com/ciitm',
-  email: 'info@ciitm.edu',
+  linkedin: 'https://linkedin.com/school/ednora',
+  facebook: 'https://facebook.com/ednora',
+  instagram: 'https://instagram.com/ednora',
+  email: 'info@ednora.edu',
   number: 9876543210,
 };
 

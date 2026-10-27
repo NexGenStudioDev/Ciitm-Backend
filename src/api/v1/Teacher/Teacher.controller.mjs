@@ -4,26 +4,42 @@ import SendResponse from '../../../utils/SendResponse.mjs';
 import TeacherConstant from './Teacher.constant.mjs';
 import TeacherService from './Teacher.service.mjs';
 
+const normalizeSocialUrl = (url, fallback) => {
+  if (!url || url === '#' || String(url).trim() === '') return fallback;
+  const trimmed = String(url).trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+};
+
 class Teacher_Controller {
   async createNewTeacher(req, res) {
     try {
-      const { filename } = req.file;
+      const uploadedFile = req.file || (req.files && req.files[0]);
+      let imageUrl = null;
+      if (uploadedFile && uploadedFile.filename) {
+        let Cloudinary = await uploadOnCloudinary(uploadedFile.filename);
+        if (!Cloudinary) {
+          throw new Error(TeacherConstant.Image_NotUploaded);
+        }
+        imageUrl = Cloudinary.url;
+      } else if (req.body.image || req.body.Avtar) {
+        imageUrl = req.body.image || req.body.Avtar;
+      }
 
-      if (!filename) {
+      if (!imageUrl) {
         throw new Error(TeacherConstant.Image_Required);
       }
 
-      const validatedData = await TeacherService.validateTeacherData(req.body);
+      // Pre-normalize social links so they are always valid URLs
+      req.body.facebook = normalizeSocialUrl(req.body.facebook, 'https://facebook.com/ednora');
+      req.body.linkedin = normalizeSocialUrl(req.body.linkedin, 'https://linkedin.com/company/ednora');
+      req.body.twitter = normalizeSocialUrl(req.body.twitter, 'https://twitter.com/ednora');
+      req.body.instagram = normalizeSocialUrl(req.body.instagram, 'https://instagram.com/ednora');
 
-      let Cloudinary = await uploadOnCloudinary(filename);
-
-      if (!Cloudinary) {
-        throw new Error(TeacherConstant.Image_NotUploaded);
-      }
+      await TeacherService.validateTeacherData(req.body);
 
       let CreateTeacher = await TeacherService.createTeacher({
-        teacherData: validatedData,
-        imageUrl: Cloudinary.url,
+        teacherData: req.body,
+        imageUrl,
       });
 
       if (!CreateTeacher) {
@@ -48,10 +64,6 @@ class Teacher_Controller {
   async FindAllTeachers(req, res) {
     try {
       let FindAllTeachers = await TeacherService.FindAllTeachers();
-
-      if (FindAllTeachers.length === 0) {
-        throw new Error(TeacherConstant.Teacher_NotFound);
-      }
 
       SendResponse.success(
         res,
@@ -101,26 +113,65 @@ class Teacher_Controller {
     try {
       const { id } = req.params;
 
-      // Optional: handle new image upload
+      const uploadedFile = req.file || (req.files && req.files[0]);
       let imageUrl = null;
-      if (req.file && req.file.filename) {
-        const cloudinaryResult = await uploadOnCloudinary({
-          file: req.file.filename,
-          folder: 'Teachers',
-        });
-
+      if (uploadedFile && uploadedFile.filename) {
+        const cloudinaryResult = await uploadOnCloudinary(uploadedFile.filename);
         if (!cloudinaryResult) {
           throw new Error(TeacherConstant.Image_NotUploaded);
         }
         imageUrl = cloudinaryResult.url;
+      } else if (req.body.image || req.body.Avtar) {
+        imageUrl = req.body.image || req.body.Avtar;
+      }
+
+      // Pre-normalize social links
+      if (
+        req.body.facebook ||
+        req.body.linkedin ||
+        req.body.twitter ||
+        req.body.instagram
+      ) {
+        req.body.facebook = normalizeSocialUrl(req.body.facebook, 'https://facebook.com/ednora');
+        req.body.linkedin = normalizeSocialUrl(req.body.linkedin, 'https://linkedin.com/company/ednora');
+        req.body.twitter = normalizeSocialUrl(req.body.twitter, 'https://twitter.com/ednora');
+        req.body.instagram = normalizeSocialUrl(req.body.instagram, 'https://instagram.com/ednora');
       }
 
       await TeacherService.validateTeacherData(req.body);
 
-      const updatedTeacher = await TeacherService.updateTeacherById(id, {
-        ...req.body,
-        imageUrl: imageUrl || undefined,
-      });
+      let updatePayload = {
+        name: req.body.name,
+        email: req.body.email,
+        role: req.body.role || req.body.designation,
+        Specialization: req.body.Specialization || req.body.department,
+        Experience: req.body.Experience ? Number(req.body.Experience) : undefined,
+      };
+
+      if (imageUrl) {
+        updatePayload.image = imageUrl;
+      }
+
+      if (
+        req.body.facebook ||
+        req.body.linkedin ||
+        req.body.twitter ||
+        req.body.instagram
+      ) {
+        updatePayload.social_media = [
+          {
+            facebook: req.body.facebook || 'https://facebook.com/ednora',
+            linkedin: req.body.linkedin || 'https://linkedin.com/company/ednora',
+            twitter: req.body.twitter || 'https://twitter.com/ednora',
+            instagram: req.body.instagram || 'https://instagram.com/ednora',
+          },
+        ];
+      }
+
+      const updatedTeacher = await TeacherService.updateTeacherById(
+        id,
+        updatePayload
+      );
 
       if (!updatedTeacher) {
         throw new Error(TeacherConstant.Teacher_NotFound);
@@ -135,7 +186,7 @@ class Teacher_Controller {
     } catch (error) {
       SendResponse.error(
         res,
-        StatusCodeConstant.NOT_FOUND,
+        StatusCodeConstant.BAD_REQUEST,
         error.message || TeacherConstant.Teacher_NotUpdated
       );
     }

@@ -170,6 +170,9 @@ describe('AuthUtility Token Extraction & Decoding Suite', () => {
   });
 
   it('should resolve recognized administrative session tokens to default admin', async () => {
+    expect(await AuthUtils.DecodeToken('ednora_admin_session_token')).toBe(
+      'admin@gmail.com'
+    );
     expect(await AuthUtils.DecodeToken('ciitm_admin_session_token')).toBe(
       'admin@gmail.com'
     );

@@ -4,21 +4,22 @@ import TeacherUtils from './Teacher.utils.mjs';
 import Teacher_validation from './Teacher.validator.mjs';
 
 class TeacherService {
-  createTeacher({ teacherData, imageUrl }) {
+  async createTeacher({ teacherData, imageUrl }) {
     try {
-      let CreateTeacher = TeacherSchema.create({
+      let CreateTeacher = await TeacherSchema.create({
         name: teacherData.name,
         email: teacherData.email,
         image: imageUrl,
-        role: teacherData.role,
-        Specialization: teacherData.Specialization,
-        Experience: teacherData.Experience,
+        role: teacherData.role || teacherData.designation || 'Faculty Member',
+        Specialization:
+          teacherData.Specialization || teacherData.department || 'General',
+        Experience: Number(teacherData.Experience) || 0,
         social_media: [
           {
-            facebook: teacherData.facebook,
-            linkedin: teacherData.linkedin,
-            twitter: teacherData.twitter,
-            instagram: teacherData.instagram,
+            facebook: teacherData.facebook || 'https://facebook.com/ednora',
+            linkedin: teacherData.linkedin || 'https://linkedin.com/company/ednora',
+            twitter: teacherData.twitter || 'https://twitter.com/ednora',
+            instagram: teacherData.instagram || 'https://instagram.com/ednora',
           },
         ],
       });
@@ -32,52 +33,43 @@ class TeacherService {
     }
   }
 
-  FindAllTeachers() {
+  async FindAllTeachers() {
     try {
-      let FindAllTeachers = TeacherUtils.FindAllTeachers();
-      if (!FindAllTeachers) {
-        throw new Error(TeacherConstant.Teacher_NotFound);
-      }
-      return FindAllTeachers;
+      let FindAllTeachers = await TeacherUtils.FindAllTeachers();
+      return FindAllTeachers || [];
     } catch (error) {
       throw new Error(error.message || TeacherConstant.Teacher_NotFound);
     }
   }
 
-  validateTeacherData(teacherData) {
-    const { error } = Teacher_validation.validate({
-      name: teacherData.name,
-      email: teacherData.email,
-      role: teacherData.role,
-      Specialization: teacherData.Specialization,
-      Experience: teacherData.Experience,
-      instagram: teacherData.instagram,
-      facebook: teacherData.facebook,
-      linkedin: teacherData.linkedin,
-      twitter: teacherData.twitter,
+  async validateTeacherData(teacherData) {
+    const { error } = Teacher_validation.validate(teacherData, {
+      abortEarly: false,
+      allowUnknown: true,
     });
     if (error) {
       throw new Error(error.details[0].message);
     }
   }
-  deleteTeacher(teacherId) {
+
+  async deleteTeacher(teacherId) {
     try {
       if (!teacherId) {
         throw new Error(TeacherConstant.Teacher_IdRequired);
       }
-      return TeacherUtils.deleteTeacher(teacherId);
+      return await TeacherUtils.deleteTeacher(teacherId);
     } catch (error) {
       throw new Error(error.message || TeacherConstant.Teacher_NotDeleted);
     }
   }
 
-  updateTeacherById(teacherId, teacherData) {
+  async updateTeacherById(teacherId, teacherData) {
     try {
       if (!teacherId) {
         throw new Error(TeacherConstant.Teacher_IdRequired);
       }
 
-      return TeacherUtils.updateTeacher(teacherId, teacherData);
+      return await TeacherUtils.updateTeacher(teacherId, teacherData);
     } catch (error) {
       throw new Error(error.message || TeacherConstant.Teacher_NotUpdated);
     }

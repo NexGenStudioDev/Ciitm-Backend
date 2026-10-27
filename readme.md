@@ -596,11 +596,86 @@ Sets an `HttpOnly` cookie named `token` and returns:
 |---|---|---|
 | `courseName` | string | Full name of the course |
 | `courseCode` | string | Unique course code (e.g., `CSE-101`) |
-| `duration` | string | Program duration (e.g., `3 Years`) |
-| `fee` | number | Total tuition fee |
-| `eligibility` | string | Admission requirements |
-| `description` | string | Syllabus summary |
-| `courseThumbnail` | file | Course preview image |
+| `Department` | string | Academic Department (e.g., `Computer Science`) |
+| `mode` | string | Mode of study (`Offline`, `Online`, `Hybrid`) |
+| `courseDuration` / `duration` | string | Program duration (e.g., `3 Years`) |
+| `coursePrice` / `fee` | number | Total tuition fee |
+| `courseEligibility` / `eligibility` | string | Admission requirements |
+| `courseDescription` / `description` | string | Syllabus summary |
+| `seats` | number | Available intake capacity |
+| `AdmissionCriteria` | array/string | Array or JSON list of admission criteria |
+| `courseThumbnail` | file / string | Course banner image file or URL fallback |
+
+##### Success Response (`201 Created`):
+```json
+{
+  "status": true,
+  "statusCode": 201,
+  "message": "Course created successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87111",
+    "courseName": "Bachelor of Computer Applications (BCA)",
+    "courseCode": "BCA-101",
+    "Department": "Computer Science",
+    "mode": "Hybrid",
+    "courseDuration": "3 Years",
+    "coursePrice": 45000,
+    "courseEligibility": "10+2 with minimum 50% aggregate marks",
+    "courseThumbnail": "https://res.cloudinary.com/.../course.jpg"
+  }
+}
+```
+
+#### 9.4 Update Course (Admin)
+- **Method**: `PUT`
+- **Path**: `/api/v1/admin/course/:id/update`
+- **Headers**: Admin authentication required
+- **Content-Type**: `multipart/form-data`
+
+##### URL Parameters:
+| Parameter | Type | Description |
+|---|---|---|
+| `id` | string | MongoDB ObjectId of the course |
+
+##### Form Fields:
+Accepts any of the fields from course creation, including an updated `courseThumbnail` file or string URL.
+
+##### Success Response (`200 OK`):
+```json
+{
+  "status": true,
+  "statusCode": 200,
+  "message": "Course updated successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87111",
+    "courseName": "Bachelor of Computer Applications (BCA)",
+    "courseCode": "BCA-101",
+    "coursePrice": 50000
+  }
+}
+```
+
+#### 9.5 Delete Course (Admin)
+- **Method**: `DELETE`
+- **Path**: `/api/v1/admin/course/:id/delete`
+- **Headers**: Admin authentication required
+
+##### URL Parameters:
+| Parameter | Type | Description |
+|---|---|---|
+| `id` | string | MongoDB ObjectId of the course |
+
+##### Success Response (`200 OK`):
+```json
+{
+  "status": true,
+  "statusCode": 200,
+  "message": "Course deleted successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87111"
+  }
+}
+```
 
 ---
 
@@ -623,8 +698,18 @@ Sets an `HttpOnly` cookie named `token` and returns:
       "department": "Computer Science & Engineering",
       "designation": "Head of Department",
       "qualification": "Ph.D. in AI & Robotics",
+      "Experience": 8,
       "email": "ananya.roy@ciitm.edu",
-      "Avtar": "/api/images/Teacher_Avtar.webp"
+      "phone": "+91 94311 00000",
+      "image": "/api/upload/teacher_avatar.jpg",
+      "social_media": [
+        {
+          "facebook": "#",
+          "linkedin": "https://linkedin.com/in/ananya-roy",
+          "twitter": "#",
+          "instagram": "#"
+        }
+      ]
     }
   ]
 }
@@ -633,15 +718,89 @@ Sets an `HttpOnly` cookie named `token` and returns:
 #### 10.2 Add Teacher (Admin)
 - **Method**: `POST`
 - **Path**: `/api/v1/admin/teacher/create`
-- **Content-Type**: `multipart/form-data` (`Avtar` file)
+- **Headers**: Admin authentication required
+- **Content-Type**: `multipart/form-data`
+
+##### Form Fields:
+| Field | Type | Required | Description |
+|---|---|:---:|---|
+| `name` | string | Yes | Full name of the faculty member |
+| `email` | string | Yes | Official institutional email |
+| `Avtar` | file / string | Yes | Portrait image file (multipart) or existing image URL |
+| `role` / `designation` | string | No | Academic appointment (e.g., `Assistant Professor`) |
+| `Specialization` / `department` | string | No | Academic department / school |
+| `qualification` | string | No | Educational credentials (e.g., `M.Tech, Ph.D.`) |
+| `Experience` | number | No | Years of teaching/industry experience |
+| `phone` | string | No | Contact telephone |
+| `facebook`, `linkedin`, `twitter`, `instagram` | string | No | Social profile links (default: `#`) |
+
+##### Success Response (`201 Created`):
+```json
+{
+  "status": true,
+  "statusCode": 201,
+  "message": "Teacher created successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87333",
+    "name": "Dr. Rajesh Kumar",
+    "email": "rajesh.kumar@ciitm.edu",
+    "role": "Assistant Professor",
+    "Specialization": "Computer Science & Engineering",
+    "Experience": 5,
+    "image": "https://res.cloudinary.com/.../faculty.jpg"
+  }
+}
+```
 
 #### 10.3 Update Teacher (Admin)
 - **Method**: `PUT`
 - **Path**: `/api/v1/admin/teacher/:id/update`
+- **Headers**: Admin authentication required
+- **Content-Type**: `multipart/form-data`
+
+##### URL Parameters:
+| Parameter | Type | Description |
+|---|---|---|
+| `id` | string | MongoDB ObjectId of the teacher |
+
+##### Form Fields:
+Accepts any faculty fields to update (`name`, `email`, `role`, `department`, `qualification`, `Experience`, `phone`, `facebook`, `linkedin`, etc.), with an optional new `Avtar` file upload or image URL.
+
+##### Success Response (`200 OK`):
+```json
+{
+  "status": true,
+  "statusCode": 200,
+  "message": "Teacher updated successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87333",
+    "name": "Dr. Rajesh Kumar",
+    "role": "Associate Professor"
+  }
+}
+```
 
 #### 10.4 Delete Teacher (Admin)
 - **Method**: `DELETE`
 - **Path**: `/api/v1/admin/teacher/:id/delete`
+- **Headers**: Admin authentication required
+
+##### URL Parameters:
+| Parameter | Type | Description |
+|---|---|---|
+| `id` | string | MongoDB ObjectId of the teacher |
+
+##### Success Response (`200 OK`):
+```json
+{
+  "status": true,
+  "statusCode": 200,
+  "message": "Teacher deleted successfully",
+  "data": {
+    "_id": "6740b2f5a8c43d9124a87333"
+  }
+}
+```
 
 ---
 

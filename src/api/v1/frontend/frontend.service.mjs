@@ -5,7 +5,7 @@ class FrontendService {
   Created_Frontend = async () => {
     try {
       let Created_Frontend = await Frontend.create({
-        logo: 'Ciitm Dhanbad',
+        logo: 'Ednora',
         landingPage: {
           HeroSection: {
             homeBackgroundImage: '/api/images/Home_bg.webp',

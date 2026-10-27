@@ -240,7 +240,7 @@ AdmissionSchema.methods.generate_id = async function () {
     specialChars: false,
   });
 
-  const uniqueId = `CIITM_${otp}`;
+  const uniqueId = `EDNORA_${otp}`;
   return uniqueId;
 };
 
