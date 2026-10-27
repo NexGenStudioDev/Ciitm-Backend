@@ -627,18 +627,18 @@ Sets an `HttpOnly` cookie named `token` and returns:
 ```
 
 #### 9.4 Update Course (Admin)
-- **Method**: `PUT`
-- **Path**: `/api/v1/admin/course/:id/update`
+- **Method**: `PUT` or `POST`
+- **Path**: `/api/v1/admin/course/:id/update` (Aliases: `PUT /api/v1/admin/course/update/:id`, `PUT /api/v1/admin/course/:id`)
 - **Headers**: Admin authentication required
-- **Content-Type**: `multipart/form-data`
+- **Content-Type**: `multipart/form-data` or `application/json`
 
 ##### URL Parameters:
 | Parameter | Type | Description |
 |---|---|---|
-| `id` | string | MongoDB ObjectId of the course |
+| `id` | string | MongoDB ObjectId or courseCode (e.g. `BCA-101`) |
 
 ##### Form Fields:
-Accepts any of the fields from course creation, including an updated `courseThumbnail` file or string URL.
+Accepts any of the fields from course creation, including an updated `courseThumbnail` file (or `image`) or string URL.
 
 ##### Success Response (`200 OK`):
 ```json
@@ -657,13 +657,13 @@ Accepts any of the fields from course creation, including an updated `courseThum
 
 #### 9.5 Delete Course (Admin)
 - **Method**: `DELETE`
-- **Path**: `/api/v1/admin/course/:id/delete`
+- **Path**: `/api/v1/admin/course/:id/delete` (Aliases: `DELETE /api/v1/admin/course/delete/:id`, `DELETE /api/v1/admin/course/:id`)
 - **Headers**: Admin authentication required
 
 ##### URL Parameters:
 | Parameter | Type | Description |
 |---|---|---|
-| `id` | string | MongoDB ObjectId of the course |
+| `id` | string | MongoDB ObjectId or courseCode of the course |
 
 ##### Success Response (`200 OK`):
 ```json
@@ -753,18 +753,18 @@ Accepts any of the fields from course creation, including an updated `courseThum
 ```
 
 #### 10.3 Update Teacher (Admin)
-- **Method**: `PUT`
-- **Path**: `/api/v1/admin/teacher/:id/update`
+- **Method**: `PUT` or `POST`
+- **Path**: `/api/v1/admin/teacher/:id/update` (Aliases: `PUT /api/v1/admin/teacher/update/:id`, `PUT /api/v1/admin/teacher/:id`)
 - **Headers**: Admin authentication required
-- **Content-Type**: `multipart/form-data`
+- **Content-Type**: `multipart/form-data` or `application/json`
 
 ##### URL Parameters:
 | Parameter | Type | Description |
 |---|---|---|
-| `id` | string | MongoDB ObjectId of the teacher |
+| `id` | string | MongoDB ObjectId or teacher identifier |
 
 ##### Form Fields:
-Accepts any faculty fields to update (`name`, `email`, `role`, `department`, `qualification`, `Experience`, `phone`, `facebook`, `linkedin`, etc.), with an optional new `Avtar` file upload or image URL.
+Accepts any faculty fields to update (`name`, `email`, `role`, `department`, `qualification`, `Experience`, `phone`, `facebook`, `linkedin`, `twitter`, `instagram`), with an optional new `Avtar` or `image` file upload or image URL. Social links are automatically normalized into valid URIs.
 
 ##### Success Response (`200 OK`):
 ```json
@@ -782,13 +782,13 @@ Accepts any faculty fields to update (`name`, `email`, `role`, `department`, `qu
 
 #### 10.4 Delete Teacher (Admin)
 - **Method**: `DELETE`
-- **Path**: `/api/v1/admin/teacher/:id/delete`
+- **Path**: `/api/v1/admin/teacher/:id/delete` (Aliases: `DELETE /api/v1/admin/teacher/delete/:id`, `DELETE /api/v1/admin/teacher/:id`)
 - **Headers**: Admin authentication required
 
 ##### URL Parameters:
 | Parameter | Type | Description |
 |---|---|---|
-| `id` | string | MongoDB ObjectId of the teacher |
+| `id` | string | MongoDB ObjectId or teacher identifier |
 
 ##### Success Response (`200 OK`):
 ```json
