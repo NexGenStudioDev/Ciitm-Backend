@@ -4,12 +4,19 @@ import SendResponse from '../../../utils/SendResponse.mjs';
 import TeacherConstant from './Teacher.constant.mjs';
 import TeacherService from './Teacher.service.mjs';
 
+const normalizeSocialUrl = (url, fallback) => {
+  if (!url || url === '#' || String(url).trim() === '') return fallback;
+  const trimmed = String(url).trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+};
+
 class Teacher_Controller {
   async createNewTeacher(req, res) {
     try {
+      const uploadedFile = req.file || (req.files && req.files[0]);
       let imageUrl = null;
-      if (req.file && req.file.filename) {
-        let Cloudinary = await uploadOnCloudinary(req.file.filename);
+      if (uploadedFile && uploadedFile.filename) {
+        let Cloudinary = await uploadOnCloudinary(uploadedFile.filename);
         if (!Cloudinary) {
           throw new Error(TeacherConstant.Image_NotUploaded);
         }
@@ -21,6 +28,12 @@ class Teacher_Controller {
       if (!imageUrl) {
         throw new Error(TeacherConstant.Image_Required);
       }
+
+      // Pre-normalize social links so they are always valid URLs
+      req.body.facebook = normalizeSocialUrl(req.body.facebook, 'https://facebook.com/ednora');
+      req.body.linkedin = normalizeSocialUrl(req.body.linkedin, 'https://linkedin.com/company/ednora');
+      req.body.twitter = normalizeSocialUrl(req.body.twitter, 'https://twitter.com/ednora');
+      req.body.instagram = normalizeSocialUrl(req.body.instagram, 'https://instagram.com/ednora');
 
       await TeacherService.validateTeacherData(req.body);
 
@@ -100,15 +113,29 @@ class Teacher_Controller {
     try {
       const { id } = req.params;
 
+      const uploadedFile = req.file || (req.files && req.files[0]);
       let imageUrl = null;
-      if (req.file && req.file.filename) {
-        const cloudinaryResult = await uploadOnCloudinary(req.file.filename);
+      if (uploadedFile && uploadedFile.filename) {
+        const cloudinaryResult = await uploadOnCloudinary(uploadedFile.filename);
         if (!cloudinaryResult) {
           throw new Error(TeacherConstant.Image_NotUploaded);
         }
         imageUrl = cloudinaryResult.url;
       } else if (req.body.image || req.body.Avtar) {
         imageUrl = req.body.image || req.body.Avtar;
+      }
+
+      // Pre-normalize social links
+      if (
+        req.body.facebook ||
+        req.body.linkedin ||
+        req.body.twitter ||
+        req.body.instagram
+      ) {
+        req.body.facebook = normalizeSocialUrl(req.body.facebook, 'https://facebook.com/ednora');
+        req.body.linkedin = normalizeSocialUrl(req.body.linkedin, 'https://linkedin.com/company/ednora');
+        req.body.twitter = normalizeSocialUrl(req.body.twitter, 'https://twitter.com/ednora');
+        req.body.instagram = normalizeSocialUrl(req.body.instagram, 'https://instagram.com/ednora');
       }
 
       await TeacherService.validateTeacherData(req.body);
@@ -133,10 +160,10 @@ class Teacher_Controller {
       ) {
         updatePayload.social_media = [
           {
-            facebook: req.body.facebook || '#',
-            linkedin: req.body.linkedin || '#',
-            twitter: req.body.twitter || '#',
-            instagram: req.body.instagram || '#',
+            facebook: req.body.facebook || 'https://facebook.com/ednora',
+            linkedin: req.body.linkedin || 'https://linkedin.com/company/ednora',
+            twitter: req.body.twitter || 'https://twitter.com/ednora',
+            instagram: req.body.instagram || 'https://instagram.com/ednora',
           },
         ];
       }

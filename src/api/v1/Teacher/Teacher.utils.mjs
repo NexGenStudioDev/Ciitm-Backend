@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import TeacherSchema from './Teacher.model.mjs';
 
 class Teacher_Utils {
@@ -25,7 +26,18 @@ class Teacher_Utils {
 
   deleteTeacher = async (teacherId) => {
     try {
-      let deletedTeacher = await TeacherSchema.findByIdAndDelete(teacherId);
+      let query;
+      if (teacherId && mongoose.Types.ObjectId.isValid(teacherId) && teacherId.length === 24) {
+        query = { _id: teacherId };
+      } else if (teacherId && teacherId !== 'undefined' && teacherId !== 'null') {
+        query = {
+          $or: [{ email: teacherId }, { name: teacherId }],
+        };
+      } else {
+        throw new Error('Teacher ID or identifier required');
+      }
+
+      let deletedTeacher = await TeacherSchema.findOneAndDelete(query);
       if (!deletedTeacher) {
         throw new Error('Teacher not found');
       }
@@ -37,15 +49,26 @@ class Teacher_Utils {
 
   updateTeacher = async (teacherId, updateData) => {
     try {
-      let updatedTeacher = await TeacherSchema.findByIdAndUpdate(
-        teacherId,
-        updateData,
-        { new: true }
-      );
-      if (!updatedTeacher) {
+      let teacher = null;
+      if (teacherId && mongoose.Types.ObjectId.isValid(teacherId) && teacherId.length === 24) {
+        teacher = await TeacherSchema.findById(teacherId);
+      }
+      if (!teacher && teacherId && teacherId !== 'undefined' && teacherId !== 'null') {
+        teacher = await TeacherSchema.findOne({
+          $or: [{ email: teacherId }, { name: teacherId }],
+        });
+      }
+      if (!teacher && updateData.email) {
+        teacher = await TeacherSchema.findOne({ email: updateData.email });
+      }
+
+      if (!teacher) {
         throw new Error('Teacher not found');
       }
-      return updatedTeacher;
+
+      Object.assign(teacher, updateData);
+      await teacher.save();
+      return teacher;
     } catch (error) {
       throw new Error(error.message);
     }

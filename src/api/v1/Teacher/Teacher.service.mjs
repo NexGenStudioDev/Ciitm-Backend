@@ -16,10 +16,10 @@ class TeacherService {
         Experience: Number(teacherData.Experience) || 0,
         social_media: [
           {
-            facebook: teacherData.facebook || '#',
-            linkedin: teacherData.linkedin || '#',
-            twitter: teacherData.twitter || '#',
-            instagram: teacherData.instagram || '#',
+            facebook: teacherData.facebook || 'https://facebook.com/ednora',
+            linkedin: teacherData.linkedin || 'https://linkedin.com/company/ednora',
+            twitter: teacherData.twitter || 'https://twitter.com/ednora',
+            instagram: teacherData.instagram || 'https://instagram.com/ednora',
           },
         ],
       });
