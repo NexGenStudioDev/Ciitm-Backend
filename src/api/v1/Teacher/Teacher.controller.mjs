@@ -7,23 +7,26 @@ import TeacherService from './Teacher.service.mjs';
 class Teacher_Controller {
   async createNewTeacher(req, res) {
     try {
-      const { filename } = req.file;
+      let imageUrl = null;
+      if (req.file && req.file.filename) {
+        let Cloudinary = await uploadOnCloudinary(req.file.filename);
+        if (!Cloudinary) {
+          throw new Error(TeacherConstant.Image_NotUploaded);
+        }
+        imageUrl = Cloudinary.url;
+      } else if (req.body.image || req.body.Avtar) {
+        imageUrl = req.body.image || req.body.Avtar;
+      }
 
-      if (!filename) {
+      if (!imageUrl) {
         throw new Error(TeacherConstant.Image_Required);
       }
 
-      const validatedData = await TeacherService.validateTeacherData(req.body);
-
-      let Cloudinary = await uploadOnCloudinary(filename);
-
-      if (!Cloudinary) {
-        throw new Error(TeacherConstant.Image_NotUploaded);
-      }
+      await TeacherService.validateTeacherData(req.body);
 
       let CreateTeacher = await TeacherService.createTeacher({
-        teacherData: validatedData,
-        imageUrl: Cloudinary.url,
+        teacherData: req.body,
+        imageUrl,
       });
 
       if (!CreateTeacher) {
@@ -48,10 +51,6 @@ class Teacher_Controller {
   async FindAllTeachers(req, res) {
     try {
       let FindAllTeachers = await TeacherService.FindAllTeachers();
-
-      if (FindAllTeachers.length === 0) {
-        throw new Error(TeacherConstant.Teacher_NotFound);
-      }
 
       SendResponse.success(
         res,
@@ -101,26 +100,51 @@ class Teacher_Controller {
     try {
       const { id } = req.params;
 
-      // Optional: handle new image upload
       let imageUrl = null;
       if (req.file && req.file.filename) {
-        const cloudinaryResult = await uploadOnCloudinary({
-          file: req.file.filename,
-          folder: 'Teachers',
-        });
-
+        const cloudinaryResult = await uploadOnCloudinary(req.file.filename);
         if (!cloudinaryResult) {
           throw new Error(TeacherConstant.Image_NotUploaded);
         }
         imageUrl = cloudinaryResult.url;
+      } else if (req.body.image || req.body.Avtar) {
+        imageUrl = req.body.image || req.body.Avtar;
       }
 
       await TeacherService.validateTeacherData(req.body);
 
-      const updatedTeacher = await TeacherService.updateTeacherById(id, {
-        ...req.body,
-        imageUrl: imageUrl || undefined,
-      });
+      let updatePayload = {
+        name: req.body.name,
+        email: req.body.email,
+        role: req.body.role || req.body.designation,
+        Specialization: req.body.Specialization || req.body.department,
+        Experience: req.body.Experience ? Number(req.body.Experience) : undefined,
+      };
+
+      if (imageUrl) {
+        updatePayload.image = imageUrl;
+      }
+
+      if (
+        req.body.facebook ||
+        req.body.linkedin ||
+        req.body.twitter ||
+        req.body.instagram
+      ) {
+        updatePayload.social_media = [
+          {
+            facebook: req.body.facebook || '#',
+            linkedin: req.body.linkedin || '#',
+            twitter: req.body.twitter || '#',
+            instagram: req.body.instagram || '#',
+          },
+        ];
+      }
+
+      const updatedTeacher = await TeacherService.updateTeacherById(
+        id,
+        updatePayload
+      );
 
       if (!updatedTeacher) {
         throw new Error(TeacherConstant.Teacher_NotFound);
@@ -135,7 +159,7 @@ class Teacher_Controller {
     } catch (error) {
       SendResponse.error(
         res,
-        StatusCodeConstant.NOT_FOUND,
+        StatusCodeConstant.BAD_REQUEST,
         error.message || TeacherConstant.Teacher_NotUpdated
       );
     }

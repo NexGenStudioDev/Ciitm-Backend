@@ -20,6 +20,14 @@ export const uploadOnCloudinary = async (localFilePath) => {
       throw new Error('File not found');
     }
 
+    if (typeof localFilePath === 'object') {
+      localFilePath =
+        localFilePath.file ||
+        localFilePath.path ||
+        localFilePath.filename ||
+        localFilePath.url;
+    }
+
     const localFileName = path.basename(localFilePath);
     const resolvedPath = path.isAbsolute(localFilePath)
       ? localFilePath

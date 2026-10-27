@@ -4,6 +4,7 @@ class Course_Utils {
   FindBy_courseName = async (courseName) => {
     return await courseModel.findOne({ courseName: courseName });
   };
+
   TOTAL_NUMBER_OF_COURSES = async () => {
     try {
       let NUMBER_OF_COURSES = (await courseModel.find({})).length;
@@ -16,7 +17,6 @@ class Course_Utils {
   FindAllCourses = async () => {
     try {
       let courses = await courseModel.find({}).sort({ createdAt: -1 });
-
       return courses;
     } catch (error) {
       throw new Error(error.message);
@@ -43,6 +43,34 @@ class Course_Utils {
         throw new Error('Course not found');
       }
       return course;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  updateCourse = async (courseId, updateData) => {
+    try {
+      let updatedCourse = await courseModel.findByIdAndUpdate(
+        courseId,
+        updateData,
+        { new: true, runValidators: true }
+      );
+      if (!updatedCourse) {
+        throw new Error('Course not found');
+      }
+      return updatedCourse;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  deleteCourse = async (courseId) => {
+    try {
+      let deletedCourse = await courseModel.findByIdAndDelete(courseId);
+      if (!deletedCourse) {
+        throw new Error('Course not found');
+      }
+      return deletedCourse;
     } catch (error) {
       throw new Error(error.message);
     }

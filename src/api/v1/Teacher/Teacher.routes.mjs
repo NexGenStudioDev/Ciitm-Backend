@@ -8,6 +8,7 @@ const router = Router();
 router.post(
   '/v1/admin/teacher/create',
   upload.single('Avtar'),
+  AuthMiddleware.Admin,
   TeacherController.createNewTeacher
 );
 router.delete(
@@ -17,6 +18,7 @@ router.delete(
 );
 router.put(
   '/v1/admin/teacher/:id/update',
+  upload.single('Avtar'),
   AuthMiddleware.Admin,
   TeacherController.updateTeacher
 );

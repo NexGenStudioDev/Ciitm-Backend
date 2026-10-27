@@ -34,19 +34,19 @@ let Teacher_Schema = new Schema(
       {
         facebook: {
           type: String,
-          required: true,
+          default: '#',
         },
         linkedin: {
           type: String,
-          required: true,
+          default: '#',
         },
         twitter: {
           type: String,
-          required: true,
+          default: '#',
         },
         instagram: {
           type: String,
-          required: true,
+          default: '#',
         },
       },
     ],

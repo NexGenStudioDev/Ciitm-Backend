@@ -13,53 +13,30 @@ let Teacher_validation = Joi.object({
     'any.required': 'Email is required',
   }),
 
-  role: Joi.string().required().messages({
-    'string.empty': 'Role is empty',
+  role: Joi.string().allow('', null).optional().messages({
     'string.base': 'Role must be a string',
-    'any.required': 'Role is required',
   }),
 
-  Specialization: Joi.string().required().messages({
-    'string.empty': 'Specialization is empty',
+  Specialization: Joi.string().allow('', null).optional().messages({
     'string.base': 'Specialization must be a string',
-    'any.required': 'Specialization is required',
   }),
 
-  Experience: Joi.number().required().messages({
-    'string.empty': 'Experience is empty',
-    'string.base': 'Experience must be a string',
-    'any.required': 'Experience is required',
-  }),
+  department: Joi.string().allow('', null).optional(),
+  designation: Joi.string().allow('', null).optional(),
+  qualification: Joi.string().allow('', null).optional(),
+  phone: Joi.string().allow('', null).optional(),
 
-  instagram: Joi.string()
-    .uri()
-    .trim()
-
-    .required()
+  Experience: Joi.alternatives()
+    .try(Joi.number(), Joi.string().allow('', null))
+    .optional()
     .messages({
-      'string.empty': 'Instagram is empty',
-      'string.base': 'Instagram must be a string',
-      'any.required': 'Instagram is required',
-      'string.uri': 'Instagram URL must be a valid URL',
+      'any.required': 'Experience is required',
     }),
-  facebook: Joi.string().uri().trim().required().messages({
-    'string.empty': 'Facebook is empty',
-    'string.base': 'Facebook must be a string',
-    'any.required': 'Facebook is required',
-    'string.uri': 'Facebook URL must be a valid URL',
-  }),
-  linkedin: Joi.string().uri().trim().required().messages({
-    'string.empty': 'LinkedIn is empty',
-    'string.base': 'LinkedIn must be a string',
-    'any.required': 'LinkedIn is required',
-    'string.uri': 'LinkedIn URL must be a valid URL',
-  }),
-  twitter: Joi.string().uri().trim().required().messages({
-    'string.empty': 'Twitter is empty',
-    'string.base': 'Twitter must be a string',
-    'any.required': 'Twitter is required',
-    'string.uri': 'Twitter URL must be a valid URL',
-  }),
+
+  instagram: Joi.string().trim().allow('', '#', null).optional(),
+  facebook: Joi.string().trim().allow('', '#', null).optional(),
+  linkedin: Joi.string().trim().allow('', '#', null).optional(),
+  twitter: Joi.string().trim().allow('', '#', null).optional(),
 });
 
 export default Teacher_validation;

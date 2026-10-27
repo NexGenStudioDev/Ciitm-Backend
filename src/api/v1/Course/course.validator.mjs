@@ -49,11 +49,10 @@ export const courseValidationSchema = Joi.object({
     'string.base': 'Course eligibility must be a valid string',
   }),
 
-  courseThumbnail: Joi.string().trim().uri().required().messages({
+  courseThumbnail: Joi.string().trim().required().messages({
     'string.empty': 'Course thumbnail URL cannot be empty',
     'any.required': 'Course thumbnail URL is required',
     'string.base': 'Course thumbnail must be a valid string',
-    'string.uri': 'Course thumbnail must be a valid URI',
   }),
 
   coursePrice: Joi.number().min(0).required().messages({

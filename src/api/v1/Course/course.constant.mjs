@@ -22,6 +22,9 @@ export const DepartmentConstant = [
   'Education',
   'Social Sciences',
   'Humanities',
+  'Computer Science',
+  'Information Technology',
+  'Commerce',
 ];
 
 export default Object.freeze(COURSE_Constant);

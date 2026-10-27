@@ -34,6 +34,22 @@ class courseService {
       throw new Error(`Error fetching courses: ${error.message}`);
     }
   }
+
+  async updateCourse(courseId, courseData) {
+    try {
+      return await courseUtils.updateCourse(courseId, courseData);
+    } catch (error) {
+      throw new Error(`Error updating course: ${error.message}`);
+    }
+  }
+
+  async deleteCourse(courseId) {
+    try {
+      return await courseUtils.deleteCourse(courseId);
+    } catch (error) {
+      throw new Error(`Error deleting course: ${error.message}`);
+    }
+  }
 }
 
 export default new courseService();
