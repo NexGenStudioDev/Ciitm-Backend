@@ -20,6 +20,8 @@ const env_Constant = {
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@gmail.com',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'Admin@123',
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+  FROM_EMAIL: process.env.FROM_EMAIL || "",
 };
 
 export default Object.freeze(env_Constant);

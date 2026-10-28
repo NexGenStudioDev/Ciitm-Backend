@@ -8,6 +8,7 @@ import lolcat from 'lolcatjs';
 import rabbitMQService from './service/rabbitmq.service.mjs';
 import SocketEvent from './config/Socket/SocketEvent.mjs';
 import Socket_Middleware from './config/Socket/SocketMiddleWare.mjs';
+import sendEmail from './utils/resendMail.mjs';
 
 app.use(cookieParser());
 
