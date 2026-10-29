@@ -54,3 +54,7 @@ coverage/
 # Other
 *.swp
 *.swo
+
+# Uploads
+public/upload/*
+!public/upload/.gitkeep
