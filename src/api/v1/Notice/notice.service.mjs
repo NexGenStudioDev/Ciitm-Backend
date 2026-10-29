@@ -1,13 +1,16 @@
 import Notice from './notice.model.mjs';
+import { Delete_From_Cloudinary } from '../../../utils/Cloudinary.mjs';
 
 class Notice_Service {
   create_Notice = async (data) => {
-    let { title, content, doc_link, type } = data;
-    let Created_Notice = await Notice.create({
+    const { title, content, doc_link, type, target, priority } = data;
+    const Created_Notice = await Notice.create({
       title,
       content,
-      doc_link,
-      type,
+      doc_link: doc_link || null,
+      type: type || 'General',
+      ...(target ? { target } : {}),
+      ...(priority ? { priority } : {}),
     });
 
     if (!Created_Notice) {
@@ -18,11 +21,21 @@ class Notice_Service {
   };
 
   delete_Notice = async (id) => {
-    let deletedNotice = await Notice.findByIdAndDelete(id);
-    if (!deletedNotice) {
+    const notice = await Notice.findById(id);
+    if (!notice) {
       throw new Error('Notice not found or already deleted');
     }
-    return deletedNotice;
+
+    if (notice.doc_link) {
+      try {
+        await Delete_From_Cloudinary(notice.doc_link);
+      } catch (err) {
+        console.warn('[Notice] Error deleting Cloudinary doc:', err.message);
+      }
+    }
+
+    await Notice.findByIdAndDelete(id);
+    return notice;
   };
 }
 

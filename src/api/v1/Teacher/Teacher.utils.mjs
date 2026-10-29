@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import TeacherSchema from './Teacher.model.mjs';
+import { Delete_From_Cloudinary } from '../../../utils/Cloudinary.mjs';
 
 class Teacher_Utils {
   FindBy_teacherName = async (teacherName) => {
@@ -41,6 +42,13 @@ class Teacher_Utils {
       if (!deletedTeacher) {
         throw new Error('Teacher not found');
       }
+      if (deletedTeacher.image) {
+        try {
+          await Delete_From_Cloudinary(deletedTeacher.image);
+        } catch (err) {
+          console.warn('[Teacher] Notice: Image deletion error:', err.message);
+        }
+      }
       return deletedTeacher;
     } catch (error) {
       throw new Error(error.message);
@@ -64,6 +72,14 @@ class Teacher_Utils {
 
       if (!teacher) {
         throw new Error('Teacher not found');
+      }
+
+      if (updateData.image && teacher.image && teacher.image !== updateData.image) {
+        try {
+          await Delete_From_Cloudinary(teacher.image);
+        } catch (err) {
+          console.warn('[Teacher] Notice: Old image deletion error:', err.message);
+        }
       }
 
       Object.assign(teacher, updateData);

@@ -8,16 +8,32 @@ import noticeUtils from './notice.utils.mjs';
 class Notice_Controller {
   Create = async (req, res) => {
     try {
-      let { title, content, type } = req.body;
-      const { filename } = req.file;
+      const { title, type, target, priority } = req.body;
+      const content = req.body.content || req.body.noticeContent || '';
 
-      let doc = await uploadOnCloudinary(filename);
+      if (!title || !content) {
+        throw new Error('Title and notice content are required');
+      }
 
-      let Created_Notice = await noticeService.create_Notice({
+      let doc_link = null;
+      const uploadedFile = req.file || (req.files && req.files[0]);
+
+      if (uploadedFile && uploadedFile.filename) {
+        const uploadResult = await uploadOnCloudinary(uploadedFile.filename);
+        if (uploadResult?.url) {
+          doc_link = uploadResult.url;
+        }
+      } else if (req.body.doc_link && req.body.doc_link !== 'null' && req.body.doc_link !== 'undefined') {
+        doc_link = req.body.doc_link;
+      }
+
+      const Created_Notice = await noticeService.create_Notice({
         title,
         content,
-        type,
-        doc_link: doc.url,
+        type: type || 'General',
+        target: target || 'All Students & Faculty',
+        priority: priority || 'normal',
+        doc_link,
       });
 
       SendResponse.success(
@@ -27,7 +43,7 @@ class Notice_Controller {
         Created_Notice
       );
     } catch (error) {
-      console.log(error);
+      console.error('[NoticeController] Create error:', error);
       SendResponse.error(
         res,
         StatusCodeConstant.INTERNAL_SERVER_ERROR,
@@ -38,23 +54,18 @@ class Notice_Controller {
 
   Find = async (req, res) => {
     try {
-      let Found_Notice = await noticeUtils.FIND(
-        parseInt(req.query.limit),
-        parseInt(req.query.page)
-      );
-
-      if (!Found_Notice || Found_Notice.length <= 0) {
-        throw new Error(Notice_Constants.NOT_FOUND);
-      }
+      const limit = parseInt(req.query.limit) || 100;
+      const page = parseInt(req.query.page) || 1;
+      const Found_Notice = await noticeUtils.FIND(limit, page);
 
       SendResponse.success(
         res,
         StatusCodeConstant.SUCCESS,
         Notice_Constants.FIND,
-        Found_Notice
+        Found_Notice || []
       );
     } catch (error) {
-      console.log(error);
+      console.error('[NoticeController] Find error:', error);
       SendResponse.error(
         res,
         StatusCodeConstant.INTERNAL_SERVER_ERROR,
@@ -77,6 +88,7 @@ class Notice_Controller {
         deletedNotice
       );
     } catch (error) {
+      console.error('[NoticeController] Delete error:', error);
       SendResponse.error(
         res,
         StatusCodeConstant.INTERNAL_SERVER_ERROR,

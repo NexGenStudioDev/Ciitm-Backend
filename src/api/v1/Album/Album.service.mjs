@@ -23,6 +23,14 @@ class Album_Service {
       throw new Error(AlbumConstant.NOT_DELETED);
     }
 
+    if (deletedAlbum.aImage_url) {
+      try {
+        await Delete_From_Cloudinary(deletedAlbum.aImage_url);
+      } catch (err) {
+        console.warn('[Album] Notice: Cover image deletion error:', err.message);
+      }
+    }
+
     // Find all images related to this album
     const images = await ImageModel.find({ albumId: albumId });
 

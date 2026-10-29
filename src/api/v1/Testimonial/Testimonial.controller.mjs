@@ -79,10 +79,16 @@ class Testimonial_Controller {
       const { id } = req.params;
 
       const deletedTestimonial = await Testimonial.findByIdAndDelete(id);
-      await Delete_From_Cloudinary(deletedTestimonial.image);
-
       if (!deletedTestimonial) {
         throw new Error('Testimonial not found');
+      }
+
+      if (deletedTestimonial.image) {
+        try {
+          await Delete_From_Cloudinary(deletedTestimonial.image);
+        } catch (err) {
+          console.warn('[Testimonial] Cloudinary image deletion error:', err.message);
+        }
       }
 
       SendResponse.success(

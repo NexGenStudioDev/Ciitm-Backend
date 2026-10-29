@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import courseModel from './course.model.mjs';
+import { Delete_From_Cloudinary } from '../../../utils/Cloudinary.mjs';
 
 class Course_Utils {
   FindBy_courseName = async (courseName) => {
@@ -98,6 +99,13 @@ class Course_Utils {
         course.coursePrice = Number(updateData.fee);
       }
       if (updateData.courseThumbnail) {
+        if (course.courseThumbnail && course.courseThumbnail !== updateData.courseThumbnail) {
+          try {
+            await Delete_From_Cloudinary(course.courseThumbnail);
+          } catch (err) {
+            console.warn('[Course] Notice: Old thumbnail deletion error:', err.message);
+          }
+        }
         course.courseThumbnail = updateData.courseThumbnail;
       }
       if (updateData.AdmissionCriteria) {
@@ -135,6 +143,13 @@ class Course_Utils {
       let deletedCourse = await courseModel.findOneAndDelete(query);
       if (!deletedCourse) {
         throw new Error('Course not found');
+      }
+      if (deletedCourse.courseThumbnail) {
+        try {
+          await Delete_From_Cloudinary(deletedCourse.courseThumbnail);
+        } catch (err) {
+          console.warn('[Course] Notice: Thumbnail deletion error:', err.message);
+        }
       }
       return deletedCourse;
     } catch (error) {
