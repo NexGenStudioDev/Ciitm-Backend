@@ -552,6 +552,50 @@ Sets an `HttpOnly` cookie named `token` and returns:
 - **Method**: `GET`
 - **Path**: `/api/v1/Student/validate/:uniqueId`
 
+#### 8.4 Promote Student Academic Term (Admin)
+- **Method**: `POST` or `PUT`
+- **Path**: `/api/v1/Student/promote` (Aliases: `/api/v1/Student/:uniqueId/promote`)
+- **Headers**: Admin authentication required
+- **Body (`application/json`)**:
+```json
+{
+  "uniqueId": "CIITM-2026-9842",
+  "semester": 3,
+  "reason": "End-Semester Examinations Cleared"
+}
+```
+*Dispatches event to RabbitMQ `notifications_queue` and sends a branded promotion email with syllabus links via Nodemailer.*
+
+#### 8.5 Demote / Adjust Student Semester (Admin)
+- **Method**: `POST` or `PUT`
+- **Path**: `/api/v1/Student/demote` (Aliases: `/api/v1/Student/:uniqueId/demote`)
+- **Headers**: Admin authentication required
+- **Body (`application/json`)**:
+```json
+{
+  "uniqueId": "CIITM-2026-9842",
+  "semester": 2,
+  "reason": "Prerequisite Retake & Academic Review"
+}
+```
+*Dispatches event to RabbitMQ `notifications_queue` and sends an academic standing notice via Nodemailer.*
+
+#### 8.6 Send Student Notification (Admin)
+- **Method**: `POST`
+- **Path**: `/api/v1/Student/send-notification` (Alias: `/api/v1/Student/notification`)
+- **Headers**: Admin authentication required
+- **Body (`application/json`)**:
+```json
+{
+  "uniqueId": "CIITM-2026-9842",
+  "email": "aarav.sharma@ciitm.edu",
+  "title": "Semester Examination Admit Cards Available",
+  "message": "Admit cards for upcoming examinations are available for download on your student portal.",
+  "priority": "Urgent"
+}
+```
+*Queues notification to RabbitMQ `notifications_queue` and delivers via Nodemailer.*
+
 ---
 
 ### 9. Course Catalog & Curriculum

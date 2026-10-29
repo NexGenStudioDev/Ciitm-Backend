@@ -120,6 +120,105 @@ class Student_Controller {
       );
     }
   }
+
+  promoteStudent = async (req, res) => {
+    try {
+      const uniqueId =
+        req.body?.uniqueId ||
+        req.params?.uniqueId ||
+        req.query?.uniqueId ||
+        req.body?.id;
+      const { semester, targetSemester, reason } = req.body || {};
+
+      if (!uniqueId) {
+        throw new Error('Student identifier (uniqueId) is required.');
+      }
+
+      const result = await StudentUtils.promoteStudent({
+        uniqueId,
+        targetSemester: targetSemester || semester,
+        reason,
+      });
+
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        `Student successfully promoted to Semester ${result.currentSemester}. Notification queued via RabbitMQ.`,
+        result
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        StatusCodeConstant.BAD_REQUEST,
+        error.message || 'Failed to promote student'
+      );
+    }
+  };
+
+  demoteStudent = async (req, res) => {
+    try {
+      const uniqueId =
+        req.body?.uniqueId ||
+        req.params?.uniqueId ||
+        req.query?.uniqueId ||
+        req.body?.id;
+      const { semester, targetSemester, reason } = req.body || {};
+
+      if (!uniqueId) {
+        throw new Error('Student identifier (uniqueId) is required.');
+      }
+
+      const result = await StudentUtils.demoteStudent({
+        uniqueId,
+        targetSemester: targetSemester || semester,
+        reason,
+      });
+
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        `Student term adjusted to Semester ${result.currentSemester}. Notification queued via RabbitMQ.`,
+        result
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        StatusCodeConstant.BAD_REQUEST,
+        error.message || 'Failed to adjust student semester'
+      );
+    }
+  };
+
+  sendNotification = async (req, res) => {
+    try {
+      const { uniqueId, email, title, message, priority } = req.body || {};
+
+      if (!title || !message) {
+        throw new Error('Notification title and message are required.');
+      }
+
+      const result = await StudentUtils.sendNotification({
+        uniqueId,
+        email,
+        title,
+        message,
+        priority,
+      });
+
+      SendResponse.success(
+        res,
+        StatusCodeConstant.SUCCESS,
+        `Notification queued successfully (${result.mode}) and will be delivered via Nodemailer.`,
+        result
+      );
+    } catch (error) {
+      SendResponse.error(
+        res,
+        StatusCodeConstant.BAD_REQUEST,
+        error.message || 'Failed to dispatch notification'
+      );
+    }
+  };
 }
 
 export default new Student_Controller();

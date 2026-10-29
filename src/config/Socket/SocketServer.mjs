@@ -5,6 +5,7 @@ import app from '../../routes/app.mjs';
 import validateEnv from '../../validation/Env.Validation.mjs';
 import { db_connect } from '../Db.config.mjs';
 import rabbitMQService from '../../service/rabbitmq.service.mjs';
+import notificationWorker from '../../service/worker.service.mjs';
 import { isOriginAllowed } from '../../utils/origin.utils.mjs';
 
 console.log(path.resolve());
@@ -37,6 +38,7 @@ const Start_App = async () => {
     await validateEnv();
     await db_connect(); // ⬅️ Ensure async function is awaited
     await rabbitMQService.connect();
+    await notificationWorker.init();
   } catch (error) {
     console.error('Error initializing background services:', error);
   }
