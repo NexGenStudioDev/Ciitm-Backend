@@ -8,12 +8,37 @@ import courseUtils from './course.utils.mjs';
 const Course_Controller = {
   async createCourse(req, res) {
     try {
-      let thumbnailUrl = req.body.courseThumbnail || '';
+      const allFiles = Array.isArray(req.files)
+        ? req.files
+        : req.file
+        ? [req.file]
+        : [];
 
-      if (req.file && req.file.filename) {
-        let uploadResult = await uploadOnCloudinary(req.file.filename);
+      // Find banner file (1st image)
+      const bannerFile =
+        allFiles.find((f) =>
+          ['courseThumbnail', 'image', 'banner', 'thumbnail'].includes(f.fieldname)
+        ) || (allFiles.length > 0 && !allFiles[0].fieldname?.toLowerCase().includes('logo') ? allFiles[0] : null);
+
+      // Find logo file (2nd image)
+      const logoFile =
+        allFiles.find((f) =>
+          ['courseLogo', 'logo', 'course_logo'].includes(f.fieldname)
+        ) || (allFiles.length > 1 && allFiles[1].fieldname?.toLowerCase().includes('logo') ? allFiles[1] : null);
+
+      let thumbnailUrl = req.body.courseThumbnail || req.body.image || '';
+      if (bannerFile && bannerFile.filename) {
+        let uploadResult = await uploadOnCloudinary(bannerFile.filename);
         if (uploadResult?.url) {
           thumbnailUrl = uploadResult.url;
+        }
+      }
+
+      let logoUrl = req.body.courseLogo || req.body.logo || null;
+      if (logoFile && logoFile.filename) {
+        let uploadLogoResult = await uploadOnCloudinary(logoFile.filename);
+        if (uploadLogoResult?.url) {
+          logoUrl = uploadLogoResult.url;
         }
       }
 
@@ -25,6 +50,7 @@ const Course_Controller = {
       let payload = {
         ...req.body,
         courseThumbnail: thumbnailUrl,
+        courseLogo: logoUrl || null,
       };
 
       if (typeof payload.AdmissionCriteria === 'string') {
@@ -67,11 +93,36 @@ const Course_Controller = {
       const courseId = req.params.id;
       let payload = { ...req.body };
 
-      if (req.file && req.file.filename) {
-        let uploadResult = await uploadOnCloudinary(req.file.filename);
+      const allFiles = Array.isArray(req.files)
+        ? req.files
+        : req.file
+        ? [req.file]
+        : [];
+
+      const bannerFile =
+        allFiles.find((f) =>
+          ['courseThumbnail', 'image', 'banner', 'thumbnail'].includes(f.fieldname)
+        ) || (allFiles.length > 0 && !allFiles[0].fieldname?.toLowerCase().includes('logo') ? allFiles[0] : null);
+
+      const logoFile =
+        allFiles.find((f) =>
+          ['courseLogo', 'logo', 'course_logo'].includes(f.fieldname)
+        ) || (allFiles.length > 1 && allFiles[1].fieldname?.toLowerCase().includes('logo') ? allFiles[1] : null);
+
+      if (bannerFile && bannerFile.filename) {
+        let uploadResult = await uploadOnCloudinary(bannerFile.filename);
         if (uploadResult?.url) {
           payload.courseThumbnail = uploadResult.url;
         }
+      }
+
+      if (logoFile && logoFile.filename) {
+        let uploadLogoResult = await uploadOnCloudinary(logoFile.filename);
+        if (uploadLogoResult?.url) {
+          payload.courseLogo = uploadLogoResult.url;
+        }
+      } else if (req.body.courseLogo) {
+        payload.courseLogo = req.body.courseLogo;
       }
 
       if (typeof payload.AdmissionCriteria === 'string') {

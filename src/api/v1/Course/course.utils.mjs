@@ -108,6 +108,16 @@ class Course_Utils {
         }
         course.courseThumbnail = updateData.courseThumbnail;
       }
+      if (updateData.courseLogo !== undefined) {
+        if (course.courseLogo && updateData.courseLogo && course.courseLogo !== updateData.courseLogo) {
+          try {
+            await Delete_From_Cloudinary(course.courseLogo);
+          } catch (err) {
+            console.warn('[Course] Notice: Old logo deletion error:', err.message);
+          }
+        }
+        course.courseLogo = updateData.courseLogo;
+      }
       if (updateData.AdmissionCriteria) {
         if (Array.isArray(updateData.AdmissionCriteria) && updateData.AdmissionCriteria.length > 0) {
           course.AdmissionCriteria = updateData.AdmissionCriteria;
@@ -149,6 +159,13 @@ class Course_Utils {
           await Delete_From_Cloudinary(deletedCourse.courseThumbnail);
         } catch (err) {
           console.warn('[Course] Notice: Thumbnail deletion error:', err.message);
+        }
+      }
+      if (deletedCourse.courseLogo) {
+        try {
+          await Delete_From_Cloudinary(deletedCourse.courseLogo);
+        } catch (err) {
+          console.warn('[Course] Notice: Logo deletion error:', err.message);
         }
       }
       return deletedCourse;

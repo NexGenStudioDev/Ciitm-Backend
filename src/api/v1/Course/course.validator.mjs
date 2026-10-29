@@ -55,6 +55,10 @@ export const courseValidationSchema = Joi.object({
     'string.base': 'Course thumbnail must be a valid string',
   }),
 
+  courseLogo: Joi.string().trim().allow(null, '').optional().messages({
+    'string.base': 'Course logo must be a valid string',
+  }),
+
   coursePrice: Joi.number().min(0).required().messages({
     'number.base': 'Course price must be a valid number',
     'number.min': 'Course price cannot be negative',

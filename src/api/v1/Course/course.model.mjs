@@ -46,6 +46,13 @@ let Course_Schema = new Schema({
     trim: true,
   },
 
+  courseLogo: {
+    type: String,
+    required: false,
+    default: null,
+    trim: true,
+  },
+
   coursePrice: {
     type: Number,
     required: true,
