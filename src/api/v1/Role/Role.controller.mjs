@@ -7,14 +7,20 @@ import RoleUtils from './Role.utils.mjs';
 class Role_Controller {
   Create_Admin_Role_Controller = async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, name, password, role, designation } = req.body;
       if (!email) {
         throw new Error('Email is required');
       }
 
       await RoleUtils.Find_Role(email);
 
-      const Create_Admin = await RoleService.create_Admin_Role(email);
+      const Create_Admin = await RoleService.create_Admin_Role({
+        email,
+        name,
+        password,
+        role: role || 'admin',
+        designation: designation || 'Campus Administrator',
+      });
 
       SendResponse.success(
         res,

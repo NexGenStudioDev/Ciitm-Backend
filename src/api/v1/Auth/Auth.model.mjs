@@ -103,12 +103,30 @@ AuthenticationSchema.statics.checkRole = async function (email) {
       if (email === 'admin@gmail.com') {
         return 'admin';
       }
+      try {
+        const Admin_Role = (await import('../Role/Role.model.mjs')).default;
+        const roleUser = await Admin_Role.findOne({ email: email });
+        if (roleUser) {
+          return roleUser.role || 'admin';
+        }
+      } catch {
+        // ignore import/lookup error
+      }
       throw new Error('User not found');
     }
     return user.role;
   } catch (error) {
     if (email === 'admin@gmail.com') {
       return 'admin';
+    }
+    try {
+      const Admin_Role = (await import('../Role/Role.model.mjs')).default;
+      const roleUser = await Admin_Role.findOne({ email: email });
+      if (roleUser) {
+        return roleUser.role || 'admin';
+      }
+    } catch {
+      // ignore import/lookup error
     }
     throw new Error(`Error checking user role: ${error.message}`);
   }

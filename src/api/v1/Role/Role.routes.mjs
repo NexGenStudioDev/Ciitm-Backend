@@ -10,6 +10,11 @@ routes.post(
   AuthMiddleware.Admin,
   RoleController.Create_Admin_Role_Controller
 );
+routes.post(
+  '/v1/admin/create',
+  AuthMiddleware.Admin,
+  RoleController.Create_Admin_Role_Controller
+);
 
 // List all portal administrators
 routes.get(
